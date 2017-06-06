@@ -11,6 +11,12 @@
   <url>http://maven.apache.org</url>
 
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-server -->
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>1.19</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
