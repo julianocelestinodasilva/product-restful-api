@@ -19,7 +19,6 @@ public class ProductResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    @Path("/product")
     public JSONObject get() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("produto","produto");
