@@ -33,17 +33,13 @@
         <pluginGroup>org.eclipse.jetty</pluginGroup>
     </pluginGroups>-->
 
-    <properties>
-        <jettyVersion>9.4.6-SNAPSHOT</jettyVersion>
-    </properties>
-
     <build>
         <finalName>product-restful-api</finalName>
         <plugins>
             <plugin>
-                <groupId>org.eclipse.jetty</groupId>
+                <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jettyVersion}</version>
+                <version>8.1.16.v20140903</version>
             </plugin>
         </plugins>
     </build>
