@@ -28,10 +28,6 @@
 
     <!--3) The application must start with a Maven command: mvn exec:java, mvn jetty:run, mvn spring-boot:run, etc.-->
     <!--http://www.eclipse.org/jetty/documentation/9.4.x/maven-and-jetty.html-->
-    <!--<pluginGroups>
-        <pluginGroup>com.oracle.weblogic</pluginGroup>
-        <pluginGroup>org.eclipse.jetty</pluginGroup>
-    </pluginGroups>-->
 
     <build>
         <finalName>product-restful-api</finalName>
@@ -40,6 +36,12 @@
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>8.1.16.v20140903</version>
+                <configuration>
+                    <!--<scanIntervalSeconds>10</scanIntervalSeconds>-->
+                    <webApp>
+                        <contextPath>/productAPI</contextPath>
+                    </webApp>
+                </configuration>
                 <executions>
                     <execution>
                         <id>start-jetty</id>
