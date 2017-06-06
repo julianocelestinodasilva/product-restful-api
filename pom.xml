@@ -26,8 +26,26 @@
         </dependency>
     </dependencies>
 
+    <!--3) The application must start with a Maven command: mvn exec:java, mvn jetty:run, mvn spring-boot:run, etc.-->
+    <!--http://www.eclipse.org/jetty/documentation/9.4.x/maven-and-jetty.html-->
+    <!--<pluginGroups>
+        <pluginGroup>com.oracle.weblogic</pluginGroup>
+        <pluginGroup>org.eclipse.jetty</pluginGroup>
+    </pluginGroups>-->
+
+    <properties>
+        <jettyVersion>9.4.6-SNAPSHOT</jettyVersion>
+    </properties>
+
     <build>
         <finalName>product-restful-api</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jettyVersion}</version>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
