@@ -37,11 +37,17 @@ public class ProductResourceTest {
     @Test
     public void get_all_products_including_specified_relationships() throws Exception {
         logger.log(Level.INFO, url);
-
         expect().statusCode(200).
                 body("size()", is(2)).
+                body("get(0).name", equalTo("Product0")).
+                body("get(0).description", equalTo("The Product0")).
+                body("get(0).parentProductId", equalTo(999)).
+                body("get(0).image", equalTo(1000)).
+                body("get(1).name", equalTo("Product1")).
+                body("get(1).description", equalTo("The Product1")).
+                body("get(1).parentProductId", equalTo(999)).
+                body("get(1).image", equalTo(1000)).
                 when().get(url);
-
         // TODO Assert no Banco
     }
 
@@ -77,16 +83,6 @@ public class ProductResourceTest {
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Created",response.jsonPath().get("messageReturn"));
         // TODO Assert no Banco
-    }
-
-    @Test
-    public void name() throws Exception {
-        logger.log(Level.INFO, url);
-        // TODO test name
-        expect().statusCode(200).
-                body("produto", equalTo("produto")).
-                when().get(url);
-
     }
 
     private JSONObject getJsonProduct(String productName) throws JSONException {

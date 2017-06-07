@@ -58,8 +58,18 @@ public class ProductResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public JSONArray getAllIncludingRelationships() throws JSONException {
         JSONArray jsonObject = new JSONArray();
-        jsonObject.put(new JSONObject());
-        jsonObject.put(new JSONObject());
+        JSONObject product0 = new JSONObject();
+        product0.put("name", "Product0");
+        product0.put("description","The Product0");
+        product0.put("parentProductId",999);
+        product0.put("image",1000);
+        jsonObject.put(product0);
+        JSONObject product1 = new JSONObject();
+        product1.put("name", "Product1");
+        product1.put("description","The Product1");
+        product1.put("parentProductId",999);
+        product1.put("image",1000);
+        jsonObject.put(product1);
         return jsonObject;
     }
 }
