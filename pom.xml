@@ -61,7 +61,6 @@
                 <configuration>
                     <stopKey></stopKey>
                     <stopPort></stopPort>
-                    <!--<scanIntervalSeconds>10</scanIntervalSeconds>-->
                     <webApp>
                         <contextPath>/productAPI</contextPath>
                     </webApp>
@@ -74,13 +73,6 @@
                             <goal>deploy-war</goal>
                         </goals>
                     </execution>
-                    <!--<execution>
-                        <id>stop-jetty</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>-->
                 </executions>
             </plugin>
             <plugin>
