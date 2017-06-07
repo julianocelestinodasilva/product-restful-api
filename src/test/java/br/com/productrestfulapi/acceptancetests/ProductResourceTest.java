@@ -31,11 +31,22 @@ public class ProductResourceTest {
     @Before
     public void setUp() throws Exception {
         url = "http://localhost:8080/productAPI/product";
-        logger.log(Level.INFO, url);
+    }
+
+    @Test
+    public void should_delete_product() throws Exception {
+        final long productId = 9999L;
+        String urlDelete = url + "/" + productId;
+        logger.log(Level.INFO, urlDelete);
+        Response response = given().contentType("application/json").and().delete(urlDelete);
+        assertEquals(200,response.getStatusCode());
+        assertEquals("Product "+productId+" was Deleted",response.jsonPath().get("messageReturn"));
+        // TODO Assert no Banco
     }
 
     @Test
     public void should_update_product() throws Exception {
+        logger.log(Level.INFO, url);
         final String productName = "MyProduct";
         JSONObject productToUpdate = getJsonProduct(productName);
         productToUpdate.put("id",9999L);
@@ -47,6 +58,7 @@ public class ProductResourceTest {
 
     @Test
     public void should_create_product() throws Exception {
+        logger.log(Level.INFO, url);
         final String productName = "MyProduct";
         JSONObject productToCreate = getJsonProduct(productName);
         Response response = given().contentType("application/json").and().body(productToCreate.toString()).post(url);
@@ -57,6 +69,7 @@ public class ProductResourceTest {
 
     @Test
     public void name() throws Exception {
+        logger.log(Level.INFO, url);
         // TODO test name
         expect().statusCode(200).
                 body("produto", equalTo("produto")).

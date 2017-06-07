@@ -16,6 +16,15 @@ public class ProductResource {
 
     // http://docs.oracle.com/javaee/6/tutorial/doc/gilik.html
 
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Path("/{id}")
+    public JSONObject delete(@PathParam("id") long id) throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("messageReturn","Product "+id+" was Deleted");
+        return jsonObject;
+    }
+
     @PUT
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
