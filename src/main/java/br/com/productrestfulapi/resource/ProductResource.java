@@ -1,4 +1,4 @@
-package br.com.productrestfulapi.acceptancetests;
+package br.com.productrestfulapi.resource;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -6,9 +6,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by juliano on 06/06/17.
