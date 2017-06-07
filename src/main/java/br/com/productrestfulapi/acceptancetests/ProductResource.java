@@ -16,6 +16,19 @@ public class ProductResource {
 
     // http://docs.oracle.com/javaee/6/tutorial/doc/gilik.html
 
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public JSONObject update(JSONObject product) throws JSONException {
+        if (product.has("id") && product.has("name")  && product.has("description")) {
+            String productName = product.getString("name");
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("messageReturn","Product "+productName+" was Updated");
+            return jsonObject;
+        }
+        return null; // TODO status code
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")

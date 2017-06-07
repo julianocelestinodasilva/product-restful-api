@@ -3,6 +3,7 @@ package br.com.productrestfulapi.acceptancetests;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import netscape.javascript.JSObject;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,12 +35,20 @@ public class ProductResourceTest {
     }
 
     @Test
+    public void should_update_product() throws Exception {
+        final String productName = "MyProduct";
+        JSONObject productToUpdate = getJsonProduct(productName);
+        productToUpdate.put("id",9999L);
+        Response response = given().contentType("application/json").and().body(productToUpdate.toString()).put(url);
+        assertEquals(200,response.getStatusCode());
+        assertEquals("Product "+productName+" was Updated",response.jsonPath().get("messageReturn"));
+        // TODO Assert no Banco
+    }
+
+    @Test
     public void should_create_product() throws Exception {
         final String productName = "MyProduct";
-        JSONObject productToCreate = new JSONObject();
-        productToCreate.put("name", productName);
-        productToCreate.put("description","This is my product");
-        // TODO productToCreate.put("parentProductID","");
+        JSONObject productToCreate = getJsonProduct(productName);
         Response response = given().contentType("application/json").and().body(productToCreate.toString()).post(url);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Created",response.jsonPath().get("messageReturn"));
@@ -53,5 +62,13 @@ public class ProductResourceTest {
                 body("produto", equalTo("produto")).
                 when().get(url);
 
+    }
+
+    private JSONObject getJsonProduct(String productName) throws JSONException {
+        JSONObject productToCreate = new JSONObject();
+        productToCreate.put("name", productName);
+        productToCreate.put("description","This is my product");
+        // TODO productToCreate.put("parentProductID","");
+        return productToCreate;
     }
 }
