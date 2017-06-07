@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -31,6 +32,17 @@ public class ProductResourceTest {
     @Before
     public void setUp() throws Exception {
         url = "http://localhost:8080/productAPI/product";
+    }
+
+    @Test
+    public void get_all_products_including_specified_relationships() throws Exception {
+        logger.log(Level.INFO, url);
+
+        expect().statusCode(200).
+                body("size()", is(2)).
+                when().get(url);
+
+        // TODO Assert no Banco
     }
 
     @Test
