@@ -1,4 +1,4 @@
-package br.com.productrestfulapi.services;
+package br.com.productrestfulapi.acceptancetests;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -14,7 +14,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
  * Created by juliano on 06/06/17.
  */
 
-// Se Teste aceite, ignorar no build
 
 public class ProductResourceTest {
 
@@ -28,7 +27,6 @@ public class ProductResourceTest {
     }
 
     @Test
-    @Ignore
     public void name() throws Exception {
         expect().statusCode(200).
                 body("produto", equalTo("produto")).

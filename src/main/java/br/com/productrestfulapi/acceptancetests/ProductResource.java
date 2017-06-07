@@ -1,4 +1,4 @@
-package br.com.productrestfulapi.services;
+package br.com.productrestfulapi.acceptancetests;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
