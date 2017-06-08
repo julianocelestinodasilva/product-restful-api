@@ -1,5 +1,7 @@
 package br.com.productrestfulapi.acceptancetests;
 
+import br.com.productrestfulapi.model.Image;
+import br.com.productrestfulapi.model.Product;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import netscape.javascript.JSObject;
@@ -10,6 +12,11 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import java.io.IOException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,12 +33,24 @@ import static org.junit.Assert.assertEquals;
 
 public class ProductResourceTest {
 
+    private static final String ARQUIVO_CONEXAO_BD = "conexao.properties";
     private Logger logger = Logger.getLogger(this.getClass().getName());
+
     private String url;
+    private EntityManager em;
+
+    private Product productOne;
+    private Product productTwo;
+    private Product productWithParent;
+
+    private List<Image> imagesProductOne;
+    private List<Image> imagesproductTwo;
+    private List<Image> imagesproductTree;
 
     @Before
     public void setUp() throws Exception {
         url = "http://localhost:8080/productAPI/product";
+        createEntityManager();
     }
 
     @Test
@@ -53,6 +72,7 @@ public class ProductResourceTest {
 
     @Test
     public void should_delete_product() throws Exception {
+        persistProducts();
         final long productId = 9999L;
         String urlDelete = url + "/" + productId;
         logger.log(Level.INFO, urlDelete);
@@ -91,5 +111,34 @@ public class ProductResourceTest {
         productToCreate.put("description","This is my product");
         // TODO productToCreate.put("parentProductID","");
         return productToCreate;
+    }
+
+    private void persistProducts() {
+        em.getTransaction().begin();
+        em.createNativeQuery("DELETE FROM Image").executeUpdate();
+        em.createNativeQuery("DELETE FROM Product").executeUpdate();
+        persistProductOne();
+        em.getTransaction().commit();
+    }
+
+    private void persistProductOne() {
+        productOne = new Product("Primeiro Produto", "Primeiro Produto");
+        imagesProductOne = new ArrayList<Image>();
+        imagesProductOne.add(new Image(productOne));
+        imagesProductOne.add(new Image(productOne));
+        productOne.setImages(imagesProductOne);
+        em.persist(productOne);
+    }
+
+    private void createEntityManager() throws IOException {
+        Map cfg = new HashMap<String,String>();
+        Properties arquivoConexao = new Properties();
+        arquivoConexao.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(ARQUIVO_CONEXAO_BD));
+        cfg.put("javax.persistence.jdbc.driver", arquivoConexao.getProperty("bd.productrestfulapi.driver"));
+        cfg.put("javax.persistence.jdbc.url", arquivoConexao.getProperty("bd.productrestfulapi.url"));
+        cfg.put("javax.persistence.jdbc.user", arquivoConexao.getProperty("bd.productrestfulapi.user"));
+        cfg.put("javax.persistence.jdbc.password", arquivoConexao.getProperty("bd.productrestfulapi.password"));
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("productrestfulapi", cfg);
+        em = factory.createEntityManager();
     }
 }
