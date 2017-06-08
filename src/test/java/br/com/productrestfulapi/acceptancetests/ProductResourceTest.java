@@ -25,6 +25,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by juliano on 06/06/17.
@@ -54,6 +55,18 @@ public class ProductResourceTest {
     }
 
     @Test
+    public void should_delete_product() throws Exception {
+        persistProducts();
+        final long productId = productOne.getId();
+        String urlDelete = url + "/" + productId;
+        logger.log(Level.INFO, urlDelete);
+        Response response = given().contentType("application/json").and().delete(urlDelete);
+        assertEquals(200,response.getStatusCode());
+        assertEquals("Product "+productId+" was Deleted",response.jsonPath().get("messageReturn"));
+        assertNull(em.find(Product.class, productId));
+    }
+
+    @Test
     public void get_all_products_including_specified_relationships() throws Exception {
         logger.log(Level.INFO, url);
         expect().statusCode(200).
@@ -67,18 +80,6 @@ public class ProductResourceTest {
                 body("get(1).parentProductId", equalTo(999)).
                 body("get(1).image", equalTo(1000)).
                 when().get(url);
-        // TODO Assert no Banco
-    }
-
-    @Test
-    public void should_delete_product() throws Exception {
-        persistProducts();
-        final long productId = 9999L;
-        String urlDelete = url + "/" + productId;
-        logger.log(Level.INFO, urlDelete);
-        Response response = given().contentType("application/json").and().delete(urlDelete);
-        assertEquals(200,response.getStatusCode());
-        assertEquals("Product "+productId+" was Deleted",response.jsonPath().get("messageReturn"));
         // TODO Assert no Banco
     }
 
