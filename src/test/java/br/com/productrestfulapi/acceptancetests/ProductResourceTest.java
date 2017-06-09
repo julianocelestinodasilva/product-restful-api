@@ -31,7 +31,6 @@ import static org.junit.Assert.assertNull;
 
 public class ProductResourceTest {
 
-    private static final String ARQUIVO_CONEXAO_BD = "conexao.properties";
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
     private String url;

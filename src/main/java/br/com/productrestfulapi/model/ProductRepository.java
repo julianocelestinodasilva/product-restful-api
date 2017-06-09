@@ -14,6 +14,7 @@ public class ProductRepository {
     }
 
     public void delete(long id) {
+        // TODO Validar se o find retornou
         Product product = em.find(Product.class, id);
         em.getTransaction().begin();
         em.remove(product);

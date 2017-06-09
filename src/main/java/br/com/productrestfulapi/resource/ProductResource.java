@@ -38,11 +38,14 @@ public class ProductResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/{id}")
     public JSONObject delete(@PathParam("id") long id) throws JSONException, IOException {
-        repository.delete(id);
-        em.close(); // TODO em.close()
-        JPAUtil.shutdown();
-        messageReturn.put("messageReturn","Product "+id+" was Deleted");
-        return messageReturn;
+        try {
+            repository.delete(id);
+            em.close();
+            messageReturn.put("messageReturn","Product "+id+" was Deleted");
+            return messageReturn;
+        } finally {
+            JPAUtil.shutdown();
+        }
     }
 
     @PUT
