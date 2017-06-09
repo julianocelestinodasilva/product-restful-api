@@ -1,20 +1,15 @@
 package br.com.productrestfulapi.resource;
 
 import br.com.productrestfulapi.model.ProductRepository;
+import br.com.productrestfulapi.util.JPAUtil;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by juliano on 06/06/17.
@@ -29,7 +24,7 @@ public class ProductResource {
 
     public ProductResource() {
         try {
-            em = createEntityManager();
+            em = JPAUtil.createEntityManager();
             repository = new ProductRepository(em);
             messageReturn = new JSONObject();
         } catch (IOException e) {
@@ -45,7 +40,7 @@ public class ProductResource {
     public JSONObject delete(@PathParam("id") long id) throws JSONException, IOException {
         repository.delete(id);
         em.close(); // TODO em.close()
-        shutdown(); // TODO shutdown()
+        JPAUtil.shutdown();
         messageReturn.put("messageReturn","Product "+id+" was Deleted");
         return messageReturn;
     }
@@ -53,11 +48,12 @@ public class ProductResource {
     @PUT
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONObject update(JSONObject product) throws JSONException {
+    public JSONObject update(JSONObject product) throws JSONException, IOException {
         if (product.has("id") && product.has("name")  && product.has("description")) {
             String productName = product.getString("name");
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("messageReturn","Product "+productName+" was Updated");
+            JPAUtil.shutdown();
             return jsonObject;
         }
         return null; // TODO status code
@@ -66,11 +62,12 @@ public class ProductResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONObject create(JSONObject product) throws JSONException {
+    public JSONObject create(JSONObject product) throws JSONException, IOException {
         if (product.has("name")  && product.has("description")) {
             String productName = product.getString("name");
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("messageReturn","Product "+productName+" was Created");
+            JPAUtil.shutdown();
             return jsonObject;
         }
         return null; // TODO status code
@@ -78,7 +75,7 @@ public class ProductResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONArray getAllIncludingRelationships() throws JSONException {
+    public JSONArray getAllIncludingRelationships() throws JSONException, IOException {
         JSONArray jsonObject = new JSONArray();
         JSONObject product0 = new JSONObject();
         product0.put("name", "Product0");
@@ -92,27 +89,7 @@ public class ProductResource {
         product1.put("parentProductId",999);
         product1.put("image",1000);
         jsonObject.put(product1);
+        JPAUtil.shutdown();
         return jsonObject;
-    }
-
-    private EntityManager createEntityManager() throws IOException {
-        // TODO Extrair p/ uma classe
-        Map cfg = new HashMap<String,String>();
-        Properties arquivoConexao = new Properties();
-        arquivoConexao.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("conexao.properties"));
-        cfg.put("javax.persistence.jdbc.driver", arquivoConexao.getProperty("bd.productrestfulapi.driver"));
-        cfg.put("javax.persistence.jdbc.url", arquivoConexao.getProperty("bd.productrestfulapi.url"));
-        cfg.put("javax.persistence.jdbc.user", arquivoConexao.getProperty("bd.productrestfulapi.user"));
-        cfg.put("javax.persistence.jdbc.password", arquivoConexao.getProperty("bd.productrestfulapi.password"));
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("productrestfulapi", cfg);
-        return factory.createEntityManager();
-    }
-
-    private void shutdown() throws IOException {
-        em = createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        tx.begin();
-        em.createNativeQuery("SHUTDOWN").executeUpdate();
-        em.close();
     }
 }

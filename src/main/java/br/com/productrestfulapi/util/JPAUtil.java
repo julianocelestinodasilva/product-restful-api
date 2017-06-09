@@ -2,6 +2,7 @@ package br.com.productrestfulapi.util;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,5 +27,14 @@ public class JPAUtil {
         cfg.put("proxool.maximum-connection-count", "20");
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("productrestfulapi", cfg);
         return factory.createEntityManager();
+    }
+
+    public static  void shutdown() throws IOException {
+        // TODO Verificar se manter shutdown
+        EntityManager em = JPAUtil.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        em.createNativeQuery("SHUTDOWN").executeUpdate();
+        em.close();
     }
 }
