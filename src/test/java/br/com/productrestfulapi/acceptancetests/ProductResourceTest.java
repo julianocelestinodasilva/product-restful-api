@@ -118,6 +118,7 @@ public class ProductResourceTest {
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
         createProductOne();
         em.persist(productOne);
+        em.flush();
         em.getTransaction().commit();
         em.close();
         shutdown();
