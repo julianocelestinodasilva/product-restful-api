@@ -7,6 +7,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -41,9 +42,10 @@ public class ProductResource {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/{id}")
-    public JSONObject delete(@PathParam("id") long id) throws JSONException {
+    public JSONObject delete(@PathParam("id") long id) throws JSONException, IOException {
         repository.delete(id);
-        em.close();
+        em.close(); // TODO em.close()
+        shutdown(); // TODO shutdown()
         messageReturn.put("messageReturn","Product "+id+" was Deleted");
         return messageReturn;
     }
@@ -104,5 +106,13 @@ public class ProductResource {
         cfg.put("javax.persistence.jdbc.password", arquivoConexao.getProperty("bd.productrestfulapi.password"));
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("productrestfulapi", cfg);
         return factory.createEntityManager();
+    }
+
+    private void shutdown() throws IOException {
+        em = createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        em.createNativeQuery("SHUTDOWN").executeUpdate();
+        em.close();
     }
 }

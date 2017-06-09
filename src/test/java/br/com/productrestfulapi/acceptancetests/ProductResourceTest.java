@@ -119,7 +119,7 @@ public class ProductResourceTest {
         createProductOne();
         em.persist(productOne);
         em.getTransaction().commit();
-        //em.close();
+        em.close();
         shutdown();
     }
 
