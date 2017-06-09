@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.io.IOException;
 import java.util.*;
@@ -63,6 +64,7 @@ public class ProductResourceTest {
         Response response = given().contentType("application/json").and().delete(urlDelete);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productId+" was Deleted",response.jsonPath().get("messageReturn"));
+        createEntityManager();
         assertNull(em.find(Product.class, productId));
     }
 
@@ -114,12 +116,22 @@ public class ProductResourceTest {
         return productToCreate;
     }
 
-    private void persistProducts() {
+    private void persistProducts() throws IOException {
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
         persistProductOne();
         em.getTransaction().commit();
+        em.close();
+        shutdown();
+    }
+
+    private void shutdown() throws IOException {
+        createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        em.createNativeQuery("SHUTDOWN").executeUpdate();
+        em.close();
     }
 
     private void persistProductOne() {

@@ -1,11 +1,19 @@
 package br.com.productrestfulapi.resource;
 
+import br.com.productrestfulapi.model.ProductRepository;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by juliano on 06/06/17.
@@ -14,15 +22,28 @@ import javax.ws.rs.core.MediaType;
 @Path("/product")
 public class ProductResource {
 
-    // http://docs.oracle.com/javaee/6/tutorial/doc/gilik.html
+    private ProductRepository repository;
+    private JSONObject messageReturn;
+
+    public ProductResource() {
+        try {
+            EntityManager em = createEntityManager();
+            repository = new ProductRepository(em);
+            messageReturn = new JSONObject();
+        } catch (IOException e) {
+            // TODO WebApp Exception status code 500
+            //throw new RuntimeException("An error occurred while trying to create ProductResource. " + e);
+            e.printStackTrace();
+        }
+    }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/{id}")
     public JSONObject delete(@PathParam("id") long id) throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("messageReturn","Product "+id+" was Deleted");
-        return jsonObject;
+        repository.delete(id);
+        messageReturn.put("messageReturn","Product "+id+" was Deleted");
+        return messageReturn;
     }
 
     @PUT
@@ -68,5 +89,18 @@ public class ProductResource {
         product1.put("image",1000);
         jsonObject.put(product1);
         return jsonObject;
+    }
+
+    private EntityManager createEntityManager() throws IOException {
+        // TODO Extrair p/ uma classe
+        Map cfg = new HashMap<String,String>();
+        Properties arquivoConexao = new Properties();
+        arquivoConexao.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("conexao.properties"));
+        cfg.put("javax.persistence.jdbc.driver", arquivoConexao.getProperty("bd.productrestfulapi.driver"));
+        cfg.put("javax.persistence.jdbc.url", arquivoConexao.getProperty("bd.productrestfulapi.url"));
+        cfg.put("javax.persistence.jdbc.user", arquivoConexao.getProperty("bd.productrestfulapi.user"));
+        cfg.put("javax.persistence.jdbc.password", arquivoConexao.getProperty("bd.productrestfulapi.password"));
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("productrestfulapi", cfg);
+        return factory.createEntityManager();
     }
 }
