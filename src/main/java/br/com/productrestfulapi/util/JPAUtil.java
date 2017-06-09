@@ -30,6 +30,7 @@ public class JPAUtil {
     }
 
     public static  void shutdown() throws IOException {
+        // TODO Verificar se IOException
         // TODO Verificar se manter shutdown
         EntityManager em = JPAUtil.createEntityManager();
         EntityTransaction tx = em.getTransaction();
