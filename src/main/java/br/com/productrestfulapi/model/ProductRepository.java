@@ -13,6 +13,10 @@ public class ProductRepository {
         this.em = em;
     }
 
+    /*http://www.objectdb.com/java/jpa/persistence/retrieve
+    A similar method, getReference, can be considered the lazy version of find:
+    Employee employee = em.getReference(Employee.class, 1);*/
+
     public boolean delete(long id) {
         Product product = em.find(Product.class, id);
         if (product == null) {

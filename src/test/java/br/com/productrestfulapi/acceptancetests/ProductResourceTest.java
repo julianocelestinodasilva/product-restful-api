@@ -11,6 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -47,6 +49,18 @@ public class ProductResourceTest {
     @Before
     public void setUp() throws Exception {
         url = "http://localhost:8080/productAPI/product";
+    }
+
+    @Test
+    public void should_create_product() throws Exception {
+        clearProducts();
+        logger.log(Level.INFO, url);
+        final String productName = "MyProduct";
+        JSONObject productToCreate = getJsonProduct(productName);
+        Response response = given().contentType("application/json").and().body(productToCreate.toString()).post(url);
+        assertEquals(200,response.getStatusCode());
+        assertEquals("Product "+productName+" was Created",response.jsonPath().get("messageReturn"));
+        assertProductwasCreated();
     }
 
     @Test
@@ -93,23 +107,31 @@ public class ProductResourceTest {
         // TODO Assert no Banco
     }
 
-    @Test
-    public void should_create_product() throws Exception {
-        logger.log(Level.INFO, url);
-        final String productName = "MyProduct";
-        JSONObject productToCreate = getJsonProduct(productName);
-        Response response = given().contentType("application/json").and().body(productToCreate.toString()).post(url);
-        assertEquals(200,response.getStatusCode());
-        assertEquals("Product "+productName+" was Created",response.jsonPath().get("messageReturn"));
-        // TODO Assert no Banco
-    }
-
     private JSONObject getJsonProduct(String productName) throws JSONException {
         JSONObject productToCreate = new JSONObject();
         productToCreate.put("name", productName);
         productToCreate.put("description","This is my product");
         // TODO productToCreate.put("parentProductID","");
         return productToCreate;
+    }
+
+    private void clearProducts() throws IOException {
+        em = JPAUtil.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("DELETE FROM Image").executeUpdate();
+        em.createNativeQuery("DELETE FROM Product").executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+        JPAUtil.shutdown();
+    }
+
+    private void assertProductwasCreated() throws IOException {
+        em = JPAUtil.createEntityManager();
+        Query query = em.createQuery("SELECT c FROM Product c");
+        List<Product> results = query.getResultList();
+        assertNotNull(results);
+        assertEquals(1,results.size());
     }
 
     private void persistProducts() throws IOException {
