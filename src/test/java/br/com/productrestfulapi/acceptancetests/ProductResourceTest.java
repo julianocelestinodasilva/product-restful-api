@@ -2,6 +2,7 @@ package br.com.productrestfulapi.acceptancetests;
 
 import br.com.productrestfulapi.model.Image;
 import br.com.productrestfulapi.model.Product;
+import br.com.productrestfulapi.util.JPAUtil;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import netscape.javascript.JSObject;
@@ -52,7 +53,6 @@ public class ProductResourceTest {
     @Before
     public void setUp() throws Exception {
         url = "http://localhost:8080/productAPI/product";
-        createEntityManager();
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ProductResourceTest {
         Response response = given().contentType("application/json").and().delete(urlDelete);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productId+" was Deleted",response.jsonPath().get("messageReturn"));
-        createEntityManager();
+        em = JPAUtil.createEntityManager();
         assertNull(em.find(Product.class, productId));
     }
 
@@ -117,6 +117,7 @@ public class ProductResourceTest {
     }
 
     private void persistProducts() throws IOException {
+        em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
@@ -127,7 +128,7 @@ public class ProductResourceTest {
     }
 
     private void shutdown() throws IOException {
-        createEntityManager();
+        em = JPAUtil.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
         em.createNativeQuery("SHUTDOWN").executeUpdate();
@@ -141,17 +142,5 @@ public class ProductResourceTest {
         imagesProductOne.add(new Image(productOne));
         productOne.setImages(imagesProductOne);
         em.persist(productOne);
-    }
-
-    private void createEntityManager() throws IOException {
-        Map cfg = new HashMap<String,String>();
-        Properties arquivoConexao = new Properties();
-        arquivoConexao.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(ARQUIVO_CONEXAO_BD));
-        cfg.put("javax.persistence.jdbc.driver", arquivoConexao.getProperty("bd.productrestfulapi.driver"));
-        cfg.put("javax.persistence.jdbc.url", arquivoConexao.getProperty("bd.productrestfulapi.url"));
-        cfg.put("javax.persistence.jdbc.user", arquivoConexao.getProperty("bd.productrestfulapi.user"));
-        cfg.put("javax.persistence.jdbc.password", arquivoConexao.getProperty("bd.productrestfulapi.password"));
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("productrestfulapi", cfg);
-        em = factory.createEntityManager();
     }
 }

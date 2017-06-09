@@ -14,6 +14,9 @@ public class ProductRepository {
     }
 
     public void delete(long id) {
-
+        Product product = em.find(Product.class, id);
+        em.getTransaction().begin();
+        em.remove(product);
+        em.getTransaction().commit();
     }
 }
