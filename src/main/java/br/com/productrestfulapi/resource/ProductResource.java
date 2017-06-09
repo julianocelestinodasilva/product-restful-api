@@ -41,6 +41,28 @@ public class ProductResource {
         }
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public JSONObject create(JSONObject product) throws JSONException, IOException {
+        try {
+            if (product.has("name") && product.has("description")) {
+
+                String name = product.getString("name");
+                String description = product.getString("name");
+
+
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("messageReturn", "Product " + name + " was Created");
+                return jsonObject;
+            }
+            return null; // TODO status code
+        } finally {
+            em.close();
+            JPAUtil.shutdown();
+        }
+    }
+
     @DELETE
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/{id}")
@@ -67,20 +89,6 @@ public class ProductResource {
             String productName = product.getString("name");
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("messageReturn","Product "+productName+" was Updated");
-            JPAUtil.shutdown();
-            return jsonObject;
-        }
-        return null; // TODO status code
-    }
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONObject create(JSONObject product) throws JSONException, IOException {
-        if (product.has("name")  && product.has("description")) {
-            String productName = product.getString("name");
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("messageReturn","Product "+productName+" was Created");
             JPAUtil.shutdown();
             return jsonObject;
         }
