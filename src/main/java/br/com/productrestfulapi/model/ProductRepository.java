@@ -19,7 +19,7 @@ public class ProductRepository {
         em.getTransaction().begin();
         em.remove(product);
         em.getTransaction().commit();
-        shutdown(); // TODO Nao usar shutdown
+        //shutdown(); // TODO Nao usar shutdown
     }
 
     private void shutdown() {

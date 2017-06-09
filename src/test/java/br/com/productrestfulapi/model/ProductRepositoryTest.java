@@ -44,7 +44,7 @@ public class ProductRepositoryTest {
         createProduct();
         em.persist(product);
         em.getTransaction().commit();
-        em.close();
+        //em.close();
     }
 
     private void createProduct() {

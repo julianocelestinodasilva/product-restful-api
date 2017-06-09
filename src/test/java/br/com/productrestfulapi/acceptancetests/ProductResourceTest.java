@@ -3,22 +3,17 @@ package br.com.productrestfulapi.acceptancetests;
 import br.com.productrestfulapi.model.Image;
 import br.com.productrestfulapi.model.Product;
 import br.com.productrestfulapi.util.JPAUtil;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import netscape.javascript.JSObject;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,10 +116,11 @@ public class ProductResourceTest {
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        persistProductOne();
+        createProductOne();
+        em.persist(productOne);
         em.getTransaction().commit();
         em.close();
-        shutdown();
+        //shutdown();
     }
 
     private void shutdown() throws IOException {
@@ -135,12 +131,11 @@ public class ProductResourceTest {
         em.close();
     }
 
-    private void persistProductOne() {
+    private void createProductOne() {
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
         imagesProductOne = new ArrayList<Image>();
         imagesProductOne.add(new Image(productOne));
         imagesProductOne.add(new Image(productOne));
         productOne.setImages(imagesProductOne);
-        em.persist(productOne);
     }
 }

@@ -14,7 +14,7 @@
 			<property name="hibernate.format_sql" value="true" />
 			
 			<property name="hibernate.connection.driver_class" value="org.hsqldb.JDBCDriver" />
-			<property name="hibernate.connection.url" value="jdbc:hsqldb:file:productrestfulapi" />
+			<!--<property name="hibernate.connection.url" value="jdbc:hsqldb:file:productrestfulapi" />-->
 
 			<property name="hibernate.connection.username" value="SA" />
 			<property name="hibernate.connection.password" value="" />
