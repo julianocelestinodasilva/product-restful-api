@@ -119,8 +119,8 @@ public class ProductResourceTest {
         createProductOne();
         em.persist(productOne);
         em.getTransaction().commit();
-        em.close();
-        //shutdown();
+        //em.close();
+        shutdown();
     }
 
     private void shutdown() throws IOException {

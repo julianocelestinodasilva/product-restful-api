@@ -23,11 +23,12 @@ import java.util.Properties;
 public class ProductResource {
 
     private ProductRepository repository;
+    private EntityManager em;
     private JSONObject messageReturn;
 
     public ProductResource() {
         try {
-            EntityManager em = createEntityManager();
+            em = createEntityManager();
             repository = new ProductRepository(em);
             messageReturn = new JSONObject();
         } catch (IOException e) {
@@ -42,6 +43,7 @@ public class ProductResource {
     @Path("/{id}")
     public JSONObject delete(@PathParam("id") long id) throws JSONException {
         repository.delete(id);
+        em.close();
         messageReturn.put("messageReturn","Product "+id+" was Deleted");
         return messageReturn;
     }
