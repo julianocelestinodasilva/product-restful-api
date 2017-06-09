@@ -1,6 +1,8 @@
 package br.com.productrestfulapi.resource;
 
 import br.com.productrestfulapi.model.ProductRepository;
+import br.com.productrestfulapi.resource.exception.InternalServerErrorException;
+import br.com.productrestfulapi.resource.exception.NotFoundException;
 import br.com.productrestfulapi.util.JPAUtil;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -10,6 +12,8 @@ import javax.persistence.EntityManager;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by juliano on 06/06/17.
@@ -18,19 +22,22 @@ import java.io.IOException;
 @Path("/product")
 public class ProductResource {
 
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
     private ProductRepository repository;
     private EntityManager em;
     private JSONObject messageReturn;
 
-    public ProductResource() {
+    public ProductResource() throws JSONException {
         try {
             em = JPAUtil.createEntityManager();
             repository = new ProductRepository(em);
             messageReturn = new JSONObject();
         } catch (IOException e) {
-            // TODO WebApp Exception status code 500
-            //throw new RuntimeException("An error occurred while trying to create ProductResource. " + e);
-            e.printStackTrace();
+            final String erroMessage = "An error occurred while trying to create ProductResource. " + e;
+            logger.log (Level.SEVERE, erroMessage);
+            messageReturn.put("messageReturn", erroMessage);
+            throw new InternalServerErrorException(messageReturn);
         }
     }
 
@@ -39,11 +46,15 @@ public class ProductResource {
     @Path("/{id}")
     public JSONObject delete(@PathParam("id") long id) throws JSONException, IOException {
         try {
-            repository.delete(id);
-            em.close();
+            boolean wasDeleted = repository.delete(id);
+            if (!wasDeleted) {
+                messageReturn.put("messageReturn", "Product "+id+" not Found");
+                throw new NotFoundException(messageReturn);
+            }
             messageReturn.put("messageReturn","Product "+id+" was Deleted");
             return messageReturn;
         } finally {
+            em.close();
             JPAUtil.shutdown();
         }
     }

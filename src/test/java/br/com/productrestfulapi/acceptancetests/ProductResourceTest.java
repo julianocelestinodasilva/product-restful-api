@@ -59,7 +59,7 @@ public class ProductResourceTest {
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productId+" was Deleted",response.jsonPath().get("messageReturn"));
         em = JPAUtil.createEntityManager();
-        assertNull(em.find(Product.class, productId)); // TODO Usar servico para find
+        assertNull(em.find(Product.class, productId));
     }
 
     @Test

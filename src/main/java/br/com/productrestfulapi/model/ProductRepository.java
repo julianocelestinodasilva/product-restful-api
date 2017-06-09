@@ -13,11 +13,14 @@ public class ProductRepository {
         this.em = em;
     }
 
-    public void delete(long id) {
-        // TODO Validar se o find retornou
+    public boolean delete(long id) {
         Product product = em.find(Product.class, id);
+        if (product == null) {
+            return false;
+        }
         em.getTransaction().begin();
         em.remove(product);
         em.getTransaction().commit();
+        return true;
     }
 }
