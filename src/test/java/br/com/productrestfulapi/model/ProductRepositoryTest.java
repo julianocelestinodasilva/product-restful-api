@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class ProductRepositoryTest {
 
     @Test
     public void should_update_product() throws Exception {
-        deleteProductsDataBase();
+        DataBaseUtils.deleteProductsDataBase();
         instanciateProductWithImages();
         final long id = DataBaseUtils.persistProductsDataBaseAndGetId(product);
         final String productName = "Namde Update";
@@ -42,7 +41,7 @@ public class ProductRepositoryTest {
 
     @Test
     public void should_create_product() throws Exception {
-        deleteProductsDataBase();
+        DataBaseUtils.deleteProductsDataBase();
         instanciateProductWithImages();
         repository.create(product);
         DataBaseUtils.assertProductWasCreated(product);
@@ -50,31 +49,12 @@ public class ProductRepositoryTest {
 
     @Test
     public void should_delete_product() throws Exception {
-        persistProductsDataBase();
+        instanciateProductWithImages();
+        DataBaseUtils.persistProductsDataBase(product);
         final long productId = product.getId();
         repository.delete(productId);
         em = JPAUtil.createEntityManager();
         assertNull(em.find(Product.class, productId));
-    }
-
-    private void persistProductsDataBase() throws IOException {
-        em = JPAUtil.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("DELETE FROM Image").executeUpdate();
-        em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        instanciateProductWithImages();
-        em.persist(product);
-        em.flush();
-        em.getTransaction().commit();
-    }
-
-    private void deleteProductsDataBase() throws IOException {
-        em = JPAUtil.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("DELETE FROM Image").executeUpdate();
-        em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        em.flush();
-        em.getTransaction().commit();
     }
 
     private void instanciateProductWithImages() {
