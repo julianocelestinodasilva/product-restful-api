@@ -6,8 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertNull;
 
@@ -19,7 +17,7 @@ public class ProductRepositoryTest {
     private EntityManager em;
 
     private Product product;
-    private List<Image> imagesProduct;
+    // TODO private List<Image> imagesProduct;
     private ProductRepository repository;
 
     @Before
@@ -30,7 +28,7 @@ public class ProductRepositoryTest {
     @Test
     public void should_update_product() throws Exception {
         DataBaseUtils.deleteProductsDataBase();
-        instanciateProductWithImages();
+        product = new Product("Primeiro Produto", "Primeiro Produto");
         final long id = DataBaseUtils.persistProductsDataBaseAndGetId(product);
         final String productName = "Namde Update";
         product.setName(productName);
@@ -42,26 +40,19 @@ public class ProductRepositoryTest {
     @Test
     public void should_create_product() throws Exception {
         DataBaseUtils.deleteProductsDataBase();
-        instanciateProductWithImages();
+        product = new Product("Primeiro Produto", "Primeiro Produto");
         repository.create(product);
         DataBaseUtils.assertProductWasCreated(product);
     }
 
     @Test
     public void should_delete_product() throws Exception {
-        instanciateProductWithImages();
+        product = new Product("Primeiro Produto", "Primeiro Produto");
         DataBaseUtils.persistProductsDataBase(product);
         final long productId = product.getId();
         repository.delete(productId);
         em = JPAUtil.createEntityManager();
         assertNull(em.find(Product.class, productId));
-    }
-
-    private void instanciateProductWithImages() {
-        product = new Product("Primeiro Produto", "Primeiro Produto");
-        imagesProduct = new ArrayList<Image>();
-        imagesProduct.add(new Image(product));
-        product.setImages(imagesProduct);
     }
 
 }
