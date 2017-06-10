@@ -53,14 +53,16 @@ public class ProductResourceTest {
 
     @Test
     public void should_update_product() throws Exception {
+        clearProductsDataBase();
+        persistProductsDataBase();
         logger.log(Level.INFO, url);
-        final String productName = "MyProduct";
+        final String productName = "Namde Update";
         JSONObject productToUpdate = getJsonProduct(productName);
         productToUpdate.put("id",9999L);
         Response response = given().contentType("application/json").and().body(productToUpdate.toString()).put(url);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Updated",response.jsonPath().get("messageReturn"));
-        // TODO Assert no Banco
+        assertProductWasUpdated(productName);
     }
 
     @Test
@@ -135,6 +137,16 @@ public class ProductResourceTest {
         // TODO assert productDataBase
     }
 
+    private void assertProductWasUpdated(String newName) throws IOException {
+        em = JPAUtil.createEntityManager();
+        Query query = em.createQuery("SELECT c FROM Product c");
+        List<Product> results = query.getResultList();
+        assertNotNull(results);
+        assertEquals(1,results.size());
+        Product productDataBase = results.get(0);
+        assertEquals(newName,productDataBase.getName());
+    }
+
     private void persistProductsDataBase() throws IOException {
         em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
@@ -142,7 +154,7 @@ public class ProductResourceTest {
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
         createProductOneWithImages();
         em.persist(productOne);
-        em.flush();  // TODO em.flush()
+        em.flush();  // TODO verificar se necessario em.flush()
         em.getTransaction().commit();
         em.close();
         JPAUtil.shutdown();
