@@ -1,11 +1,13 @@
 package br.com.productrestfulapi.model;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -101,7 +103,7 @@ public class Product implements Serializable {
             }
             product.setId(json.getLong("id"));
             return product;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -110,22 +112,18 @@ public class Product implements Serializable {
         verifyFieldsNotNull(json);
         try {
             return getFromJSON(json);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private static Product getFromJSON(JSONObject json) throws JSONException {
-        String name = json.getString("name");
-        String description = json.getString("description");
+    private static Product getFromJSON(JSONObject jsonProduct) throws JSONException {
+        String name = jsonProduct.getString("name");
+        String description = jsonProduct.getString("description");
         Product product = new Product(name, description);
-        if (json.has("parent")) {
-            Product parent = (Product) json.get("parent");
+        if (jsonProduct.has("parent")) {
+            Product parent = (Product) jsonProduct.get("parent");
             product.setParent(parent);
-        }
-        if (json.has("images")) {
-            List<Image> images = (List<Image>) json.get("images");
-            product.setImages(images);
         }
         return product;
     }
