@@ -1,7 +1,5 @@
 package br.com.productrestfulapi.model;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
-
 import javax.persistence.EntityManager;
 
 /**
@@ -21,11 +19,11 @@ public class ProductRepository {
 
     public void create(Product product) throws IllegalArgumentException {
         if (product == null) {
-            throw new IllegalArgumentException("Product was not informed !");
+            throw new IllegalArgumentException(Product.PRODUCT_WAS_NOT_INFORMED);
         }
         if (product.getName() == null || product.getName().isEmpty()
                 || product.getDescription() == null || product.getDescription().isEmpty()) {
-            throw new IllegalArgumentException("name or description was not informed !");
+            throw new IllegalArgumentException(Product.NAME_OR_DESCRIPTION_WAS_NOT_INFORMED);
         }
         em.getTransaction().begin();
         em.persist(product);

@@ -1,6 +1,8 @@
 package br.com.productrestfulapi.resource;
 
+import br.com.productrestfulapi.model.Product;
 import br.com.productrestfulapi.model.ProductRepository;
+import br.com.productrestfulapi.resource.exception.BadRequestException;
 import br.com.productrestfulapi.resource.exception.InternalServerErrorException;
 import br.com.productrestfulapi.resource.exception.NotFoundException;
 import br.com.productrestfulapi.util.JPAUtil;
@@ -44,19 +46,17 @@ public class ProductResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONObject create(JSONObject product) throws JSONException, IOException {
+    public JSONObject create(JSONObject productJson) throws JSONException, IOException {
         try {
-            if (product.has("name") && product.has("description")) {
-
-                String name = product.getString("name");
-                String description = product.getString("name");
-
-
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("messageReturn", "Product " + name + " was Created");
-                return jsonObject;
-            }
-            return null; // TODO status code
+            Product product = Product.getFromJSONObject(productJson);
+            repository.create(product);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("messageReturn", "Product " + product.getName()+ " was Created");
+            return jsonObject;
+        } catch (IllegalArgumentException e) {
+            logger.log (Level.WARNING, e.getMessage());
+            messageReturn.put("messageReturn", e.getMessage());
+            throw new BadRequestException(messageReturn);
         } finally {
             em.close();
             JPAUtil.shutdown();

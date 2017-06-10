@@ -67,7 +67,6 @@ public class ProductRepositoryTest {
         createProductWithImages();
         em.persist(product);
         em.getTransaction().commit();
-        //em.close();
     }
 
     private void clearProductsDataBase() throws IOException {
