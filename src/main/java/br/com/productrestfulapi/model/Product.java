@@ -1,13 +1,11 @@
 package br.com.productrestfulapi.model;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -96,11 +94,9 @@ public class Product implements Serializable {
 
     public static Product getFromJSONToUpdate(JSONObject json) throws IllegalArgumentException {
         verifyFieldsNotNull(json);
+        verifyId(json);
         try {
             Product product = getFromJSON(json);
-            if (!json.has("id") || json.getLong("id") < 1) {
-                throw new IllegalArgumentException(ID_WAS_NOT_INFORMED);
-            }
             product.setId(json.getLong("id"));
             return product;
         } catch (Exception e) {
@@ -126,6 +122,16 @@ public class Product implements Serializable {
             product.setParent(parent);
         }
         return product;
+    }
+
+    private static void verifyId(JSONObject json) throws IllegalArgumentException {
+        try {
+            if (!json.has("id") || json.getLong("id") < 1) {
+                throw new IllegalArgumentException(ID_WAS_NOT_INFORMED);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     private static void verifyFieldsNotNull(JSONObject json) {
