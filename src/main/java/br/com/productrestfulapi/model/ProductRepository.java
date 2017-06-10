@@ -13,18 +13,14 @@ public class ProductRepository {
         this.em = em;
     }
 
-    /*http://www.objectdb.com/java/jpa/persistence/retrieve
-    A similar method, getReference, can be considered the lazy version of find:
-    Employee employee = em.getReference(Employee.class, 1);*/
-
-    public void update(Product product) throws IllegalArgumentException {
+    public void update(Product product) {
         verifyFieldsNotNull(product);
         em.getTransaction().begin();
         em.merge(product);
         em.getTransaction().commit();
     }
 
-    public void create(Product product) throws IllegalArgumentException {
+    public void create(Product product) {
         verifyFieldsNotNull(product);
         em.getTransaction().begin();
         em.persist(product);
@@ -42,7 +38,7 @@ public class ProductRepository {
         return true;
     }
 
-    private void verifyFieldsNotNull(Product product) throws IllegalArgumentException {
+    private void verifyFieldsNotNull(Product product) {
         if (product == null) {
             throw new IllegalArgumentException(Product.PRODUCT_WAS_NOT_INFORMED);
         }
