@@ -3,6 +3,7 @@ package br.com.productrestfulapi.acceptancetests;
 import br.com.productrestfulapi.model.Image;
 import br.com.productrestfulapi.model.Product;
 import br.com.productrestfulapi.util.JPAUtil;
+import br.com.productrestfulapi.utils.DataBaseUtils;
 import io.restassured.response.Response;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -54,15 +55,16 @@ public class ProductResourceTest {
     @Test
     public void should_update_product() throws Exception {
         deleteProductsDataBase();
-        persistProductsDataBase();
+        instanciateProductOneWithImages();
+        final long id = DataBaseUtils.persistProductsDataBaseAndGetId(productOne);
         logger.log(Level.INFO, url);
         final String productName = "Namde Update";
-        JSONObject productToUpdate = getJsonProduct(productName);
+        JSONObject productToUpdate = getJsonProduct(productName,id);
         productToUpdate.put("id",9999L);
         Response response = given().contentType("application/json").and().body(productToUpdate.toString()).put(url);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Updated",response.jsonPath().get("messageReturn"));
-        assertProductWasUpdated(productName);
+        DataBaseUtils.assertProductWasUpdated(productName);
     }
 
     @Test
@@ -144,16 +146,6 @@ public class ProductResourceTest {
         assertNotNull(results);
         assertEquals(1,results.size());
         // TODO assert productDataBase
-    }
-
-    private void assertProductWasUpdated(String newName) throws IOException {
-        em = JPAUtil.createEntityManager();
-        Query query = em.createQuery("SELECT c FROM Product c");
-        List<Product> results = query.getResultList();
-        assertNotNull(results);
-        assertEquals(1,results.size());
-        Product productDataBase = results.get(0);
-        assertEquals(newName,productDataBase.getName());
     }
 
     private void persistProductsDataBase() throws IOException {

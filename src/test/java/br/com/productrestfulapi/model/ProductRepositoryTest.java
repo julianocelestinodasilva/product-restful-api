@@ -6,13 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -40,7 +37,7 @@ public class ProductRepositoryTest {
         product.setName(productName);
         product.setId(id);
         repository.update(product);
-        assertProductWasUpdated(productName);
+        DataBaseUtils.assertProductWasUpdated(productName);
     }
 
     @Test
@@ -48,7 +45,7 @@ public class ProductRepositoryTest {
         deleteProductsDataBase();
         instanciateProductWithImages();
         repository.create(product);
-        assertProductWasCreated();
+        DataBaseUtils.assertProductWasCreated(product);
     }
 
     @Test
@@ -58,24 +55,6 @@ public class ProductRepositoryTest {
         repository.delete(productId);
         em = JPAUtil.createEntityManager();
         assertNull(em.find(Product.class, productId));
-    }
-
-    private void assertProductWasUpdated(String newName) throws IOException {
-        List<Product> results = getProductsDataBase();
-        assertNotNull(results);
-        assertEquals(1,results.size());
-        Product productDataBase = results.get(0);
-        assertEquals(newName,productDataBase.getName());
-    }
-
-    private void assertProductWasCreated() throws IOException {
-        List<Product> results = getProductsDataBase();
-        assertNotNull(results);
-        assertEquals(1,results.size());
-        Product productDataBase = results.get(0);
-        assertEquals(product.getName(),productDataBase.getName());
-        assertEquals(product.getDescription(),productDataBase.getDescription());
-        assertEquals(product.getImages().get(0),productDataBase.getImages().get(0));
     }
 
     private void persistProductsDataBase() throws IOException {
@@ -96,13 +75,6 @@ public class ProductRepositoryTest {
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
         em.flush();
         em.getTransaction().commit();
-    }
-
-    private List<Product> getProductsDataBase() throws IOException {
-        // TODO Move to DataBaseUtils
-        em = JPAUtil.createEntityManager();
-        Query query = em.createQuery("SELECT c FROM Product c");
-        return (List<Product>) query.getResultList();
     }
 
     private void instanciateProductWithImages() {
