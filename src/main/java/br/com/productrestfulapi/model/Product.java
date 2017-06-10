@@ -92,7 +92,7 @@ public class Product implements Serializable {
         return result;
     }
 
-    public static Product getFromJSONToUpdate(JSONObject json) throws IllegalArgumentException {
+    public static Product getFromJSONToUpdate(JSONObject json) {
         verifyFieldsNotNull(json);
         verifyId(json);
         try {
@@ -104,7 +104,7 @@ public class Product implements Serializable {
         }
     }
 
-    public static Product getFromJSONToCreate(JSONObject json) throws IllegalArgumentException {
+    public static Product getFromJSONToCreate(JSONObject json) {
         verifyFieldsNotNull(json);
         try {
             return getFromJSON(json);
@@ -124,7 +124,7 @@ public class Product implements Serializable {
         return product;
     }
 
-    private static void verifyId(JSONObject json) throws IllegalArgumentException {
+    private static void verifyId(JSONObject json) {
         try {
             if (!json.has("id") || json.getLong("id") < 1) {
                 throw new IllegalArgumentException(ID_WAS_NOT_INFORMED);
