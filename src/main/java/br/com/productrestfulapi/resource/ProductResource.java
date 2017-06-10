@@ -21,6 +21,8 @@ import java.util.logging.Logger;
  * Created by juliano on 06/06/17.
  */
 
+// TODO IOException --> InternalServerErrorException
+
 @Path("/product")
 public class ProductResource {
 
