@@ -52,6 +52,18 @@ public class ProductResourceTest {
     }
 
     @Test
+    public void should_update_product() throws Exception {
+        logger.log(Level.INFO, url);
+        final String productName = "MyProduct";
+        JSONObject productToUpdate = getJsonProduct(productName);
+        productToUpdate.put("id",9999L);
+        Response response = given().contentType("application/json").and().body(productToUpdate.toString()).put(url);
+        assertEquals(200,response.getStatusCode());
+        assertEquals("Product "+productName+" was Updated",response.jsonPath().get("messageReturn"));
+        // TODO Assert no Banco
+    }
+
+    @Test
     public void should_create_product() throws Exception {
         clearProductsDataBase();
         logger.log(Level.INFO, url);
@@ -92,18 +104,6 @@ public class ProductResourceTest {
                 body("get(1).parentProductId", equalTo(999)).
                 body("get(1).image", equalTo(1000)).
                 when().get(url);
-        // TODO Assert no Banco
-    }
-
-    @Test
-    public void should_update_product() throws Exception {
-        logger.log(Level.INFO, url);
-        final String productName = "MyProduct";
-        JSONObject productToUpdate = getJsonProduct(productName);
-        productToUpdate.put("id",9999L);
-        Response response = given().contentType("application/json").and().body(productToUpdate.toString()).put(url);
-        assertEquals(200,response.getStatusCode());
-        assertEquals("Product "+productName+" was Updated",response.jsonPath().get("messageReturn"));
         // TODO Assert no Banco
     }
 

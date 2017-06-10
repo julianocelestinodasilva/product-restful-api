@@ -15,7 +15,6 @@ public class Image implements Serializable {
     @JoinColumn(name = "id_product", referencedColumnName = "id_product")
     @ManyToOne(optional = false)
     private Product product;
-    // We have a Product Entity with One to Many relationship with Image entity
 
     public Image(Product product) {
         this.id = id;
