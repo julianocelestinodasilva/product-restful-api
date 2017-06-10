@@ -132,6 +132,7 @@ public class ProductResourceTest {
         List<Product> results = query.getResultList();
         assertNotNull(results);
         assertEquals(1,results.size());
+        // TODO assert productDataBase
     }
 
     private void persistProductsDataBase() throws IOException {
