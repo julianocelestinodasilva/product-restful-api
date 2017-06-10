@@ -117,6 +117,18 @@ public class Product implements Serializable {
         return result;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setParent(Product parent) {
         this.parent = parent;
     }

@@ -53,7 +53,7 @@ public class ProductResourceTest {
 
     @Test
     public void should_update_product() throws Exception {
-        clearProductsDataBase();
+        deleteProductsDataBase();
         persistProductsDataBase();
         logger.log(Level.INFO, url);
         final String productName = "Namde Update";
@@ -67,7 +67,7 @@ public class ProductResourceTest {
 
     @Test
     public void should_create_product() throws Exception {
-        clearProductsDataBase();
+        deleteProductsDataBase();
         logger.log(Level.INFO, url);
         final String productName = "MyProduct";
         JSONObject productToCreate = getJsonProduct(productName);
@@ -117,7 +117,7 @@ public class ProductResourceTest {
         return productToCreate;
     }
 
-    private void clearProductsDataBase() throws IOException {
+    private void deleteProductsDataBase() throws IOException {
         em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
@@ -152,15 +152,15 @@ public class ProductResourceTest {
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        createProductOneWithImages();
+        instanciateProductOneWithImages();
         em.persist(productOne);
-        em.flush();  // TODO verificar se necessario em.flush()
+        em.flush();
         em.getTransaction().commit();
         em.close();
         JPAUtil.shutdown();
     }
 
-    private void createProductOneWithImages() {
+    private void instanciateProductOneWithImages() {
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
         imagesProductOne = new ArrayList<Image>();
         imagesProductOne.add(new Image(productOne));

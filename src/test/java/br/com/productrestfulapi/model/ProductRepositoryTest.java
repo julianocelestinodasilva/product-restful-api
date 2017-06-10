@@ -31,9 +31,21 @@ public class ProductRepositoryTest {
     }
 
     @Test
+    public void should_update_product() throws Exception {
+        deleteProductsDataBase();
+        final long id = persistProductsDataBaseAndGetId();
+        instanciateProductWithImages();
+        final String productName = "Namde Update";
+        product.setName(productName);
+        product.setId(id);
+        repository.update(product);
+        assertProductWasUpdated(productName);
+    }
+
+    @Test
     public void should_create_product() throws Exception {
-        clearProductsDataBase();
-        createProductWithImages();
+        deleteProductsDataBase();
+        instanciateProductWithImages();
         repository.create(product);
         assertProductWasCreated();
     }
@@ -47,10 +59,16 @@ public class ProductRepositoryTest {
         assertNull(em.find(Product.class, productId));
     }
 
+    private void assertProductWasUpdated(String newName) throws IOException {
+        List<Product> results = getProductsDataBase();
+        assertNotNull(results);
+        assertEquals(1,results.size());
+        Product productDataBase = results.get(0);
+        assertEquals(newName,productDataBase.getName());
+    }
+
     private void assertProductWasCreated() throws IOException {
-        em = JPAUtil.createEntityManager();
-        Query query = em.createQuery("SELECT c FROM Product c");
-        List<Product> results = query.getResultList();
+        List<Product> results = getProductsDataBase();
         assertNotNull(results);
         assertEquals(1,results.size());
         Product productDataBase = results.get(0);
@@ -64,12 +82,26 @@ public class ProductRepositoryTest {
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        createProductWithImages();
+        instanciateProductWithImages();
         em.persist(product);
+        em.flush();
         em.getTransaction().commit();
     }
 
-    private void clearProductsDataBase() throws IOException {
+    private long persistProductsDataBaseAndGetId() throws IOException {
+        em = JPAUtil.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("DELETE FROM Image").executeUpdate();
+        em.createNativeQuery("DELETE FROM Product").executeUpdate();
+        instanciateProductWithImages();
+        em.persist(product);
+        em.flush();
+        em.getTransaction().commit();
+        List<Product> results = getProductsDataBase();
+        return results.get(0).getId();
+    }
+
+    private void deleteProductsDataBase() throws IOException {
         em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
@@ -78,7 +110,13 @@ public class ProductRepositoryTest {
         em.getTransaction().commit();
     }
 
-    private void createProductWithImages() {
+    private List<Product> getProductsDataBase() throws IOException {
+        em = JPAUtil.createEntityManager();
+        Query query = em.createQuery("SELECT c FROM Product c");
+        return (List<Product>) query.getResultList();
+    }
+
+    private void instanciateProductWithImages() {
         product = new Product("Primeiro Produto", "Primeiro Produto");
         imagesProduct = new ArrayList<Image>();
         imagesProduct.add(new Image(product));
