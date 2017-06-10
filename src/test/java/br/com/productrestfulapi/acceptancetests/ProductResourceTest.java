@@ -49,6 +49,25 @@ public class ProductResourceTest {
     }
 
     @Test
+    @Ignore
+    public void get_all_products_including_specified_relationships() throws Exception {
+        // java.lang.IllegalArgumentException: Path get(0).name is invalid.
+        logger.log(Level.INFO, url);
+        expect().statusCode(200).
+                body("size()", is(2)).
+                body("get(0).name", equalTo("Product0")).
+                body("get(0).description", equalTo("The Product0")).
+                body("get(0).parentProductId", equalTo(999)).
+                body("get(0).image", equalTo(1000)).
+                body("get(1).name", equalTo("Product1")).
+                body("get(1).description", equalTo("The Product1")).
+                body("get(1).parentProductId", equalTo(999)).
+                body("get(1).image", equalTo(1000)).
+                when().get(url);
+        // TODO Assert no Banco
+    }
+
+    @Test
     public void should_update_product() throws Exception {
         DataBaseUtils.deleteProductsDataBase();
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
@@ -92,25 +111,6 @@ public class ProductResourceTest {
         assertEquals("Product "+productId+" was Deleted",response.jsonPath().get("messageReturn"));
         em = JPAUtil.createEntityManager();
         assertNull(em.find(Product.class, productId));
-    }
-
-    @Test
-    @Ignore
-    public void get_all_products_including_specified_relationships() throws Exception {
-        // java.lang.IllegalArgumentException: Path get(0).name is invalid.
-        logger.log(Level.INFO, url);
-        expect().statusCode(200).
-                body("size()", is(2)).
-                body("get(0).name", equalTo("Product0")).
-                body("get(0).description", equalTo("The Product0")).
-                body("get(0).parentProductId", equalTo(999)).
-                body("get(0).image", equalTo(1000)).
-                body("get(1).name", equalTo("Product1")).
-                body("get(1).description", equalTo("The Product1")).
-                body("get(1).parentProductId", equalTo(999)).
-                body("get(1).image", equalTo(1000)).
-                when().get(url);
-        // TODO Assert no Banco
     }
 
     private JSONObject getJsonProduct(String productName, long id) throws JSONException {
