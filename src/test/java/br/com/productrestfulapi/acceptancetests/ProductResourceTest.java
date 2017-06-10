@@ -109,6 +109,15 @@ public class ProductResourceTest {
         // TODO Assert no Banco
     }
 
+    private JSONObject getJsonProduct(String productName, long id) throws JSONException {
+        JSONObject productToCreate = new JSONObject();
+        productToCreate.put("id", id);
+        productToCreate.put("name", productName);
+        productToCreate.put("description","This is my product");
+        // TODO productToCreate.put("parentProductID","");
+        return productToCreate;
+    }
+
     private JSONObject getJsonProduct(String productName) throws JSONException {
         JSONObject productToCreate = new JSONObject();
         productToCreate.put("name", productName);

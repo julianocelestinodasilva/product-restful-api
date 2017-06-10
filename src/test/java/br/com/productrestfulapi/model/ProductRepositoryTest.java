@@ -1,6 +1,7 @@
 package br.com.productrestfulapi.model;
 
 import br.com.productrestfulapi.util.JPAUtil;
+import br.com.productrestfulapi.utils.DataBaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,8 +34,8 @@ public class ProductRepositoryTest {
     @Test
     public void should_update_product() throws Exception {
         deleteProductsDataBase();
-        final long id = persistProductsDataBaseAndGetId();
         instanciateProductWithImages();
+        final long id = DataBaseUtils.persistProductsDataBaseAndGetId(product);
         final String productName = "Namde Update";
         product.setName(productName);
         product.setId(id);
@@ -88,19 +89,6 @@ public class ProductRepositoryTest {
         em.getTransaction().commit();
     }
 
-    private long persistProductsDataBaseAndGetId() throws IOException {
-        em = JPAUtil.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("DELETE FROM Image").executeUpdate();
-        em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        instanciateProductWithImages();
-        em.persist(product);
-        em.flush();
-        em.getTransaction().commit();
-        List<Product> results = getProductsDataBase();
-        return results.get(0).getId();
-    }
-
     private void deleteProductsDataBase() throws IOException {
         em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
@@ -111,6 +99,7 @@ public class ProductRepositoryTest {
     }
 
     private List<Product> getProductsDataBase() throws IOException {
+        // TODO Move to DataBaseUtils
         em = JPAUtil.createEntityManager();
         Query query = em.createQuery("SELECT c FROM Product c");
         return (List<Product>) query.getResultList();
