@@ -141,7 +141,7 @@ public class ProductResourceTest {
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
         createProductOneWithImages();
         em.persist(productOne);
-        em.flush();
+        em.flush();  // TODO em.flush()
         em.getTransaction().commit();
         em.close();
         JPAUtil.shutdown();

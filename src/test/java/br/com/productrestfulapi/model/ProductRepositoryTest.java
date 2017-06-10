@@ -33,6 +33,7 @@ public class ProductRepositoryTest {
     @Test
     public void should_create_product() throws Exception {
         clearProductsDataBase();
+        createProductWithImages();
         repository.create(product);
         assertProductWasCreated();
     }
@@ -52,6 +53,10 @@ public class ProductRepositoryTest {
         List<Product> results = query.getResultList();
         assertNotNull(results);
         assertEquals(1,results.size());
+        Product productDataBase = results.get(0);
+        assertEquals(product.getName(),productDataBase.getName());
+        assertEquals(product.getDescription(),productDataBase.getDescription());
+        assertEquals(product.getImages().get(0),productDataBase.getImages().get(0));
     }
 
     private void persistProductsDataBase() throws IOException {
@@ -72,8 +77,6 @@ public class ProductRepositoryTest {
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
         em.flush();
         em.getTransaction().commit();
-        em.close();
-        JPAUtil.shutdown();
     }
 
     private void createProductWithImages() {
