@@ -1,6 +1,5 @@
 package br.com.productrestfulapi.acceptancetests;
 
-import br.com.productrestfulapi.model.Image;
 import br.com.productrestfulapi.model.Product;
 import br.com.productrestfulapi.util.JPAUtil;
 import br.com.productrestfulapi.utils.DataBaseUtils;
@@ -12,10 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,9 +39,9 @@ public class ProductResourceTest {
     private Product productTwo;
     private Product productWithParent;
 
-    private List<Image> imagesProductOne;
-    private List<Image> imagesproductTwo;
-    private List<Image> imagesproductTree;
+    // private List<Image> imagesProductOne;
+    // private List<Image> imagesproductTwo;
+    // private List<Image> imagesproductTree;
 
     @Before
     public void setUp() throws Exception {
@@ -54,8 +50,9 @@ public class ProductResourceTest {
 
     @Test
     public void should_update_product() throws Exception {
-        deleteProductsDataBase();
-        instanciateProductOneWithImages();
+        DataBaseUtils.deleteProductsDataBase();
+        productOne = new Product("Primeiro Produto", "Primeiro Produto");
+        // TODO Product Parent ?
         final long id = DataBaseUtils.persistProductsDataBaseAndGetId(productOne);
         JPAUtil.shutdown();
         logger.log(Level.INFO, url);
@@ -69,19 +66,24 @@ public class ProductResourceTest {
 
     @Test
     public void should_create_product() throws Exception {
-        deleteProductsDataBase();
+        DataBaseUtils.deleteProductsDataBase();
+        JPAUtil.shutdown();
         logger.log(Level.INFO, url);
-        final String productName = "MyProduct";
-        JSONObject productToCreate = getJsonProduct(productName);
+        productOne = new Product("Primeiro Produto", "Primeiro Produto");
+        // TODO Product Parent ?
+        final String productName = productOne.getName();
+        JSONObject productToCreate = getJsonProduct(productOne);
         Response response = given().contentType("application/json").and().body(productToCreate.toString()).post(url);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Created",response.jsonPath().get("messageReturn"));
-        assertProductWasCreated();
+        DataBaseUtils.assertProductWasCreated(productOne);
     }
 
     @Test
     public void should_delete_product() throws Exception {
-        persistProductsDataBase();
+        productOne = new Product("Primeiro Produto", "Primeiro Produto");
+        DataBaseUtils.persistProductsDataBase(productOne);
+        JPAUtil.shutdown();
         final long productId = productOne.getId();
         String urlDelete = url + "/" + productId;
         logger.log(Level.INFO, urlDelete);
@@ -120,53 +122,11 @@ public class ProductResourceTest {
         return productToCreate;
     }
 
-    private JSONObject getJsonProduct(String productName) throws JSONException {
+    private JSONObject getJsonProduct(Product product) throws JSONException {
         JSONObject productToCreate = new JSONObject();
-        productToCreate.put("name", productName);
-        productToCreate.put("description","This is my product");
+        productToCreate.put("name", product.getName());
+        productToCreate.put("description",product.getDescription());
         // TODO productToCreate.put("parentProductID","");
         return productToCreate;
-    }
-
-    private void deleteProductsDataBase() throws IOException {
-        em = JPAUtil.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("DELETE FROM Image").executeUpdate();
-        em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        em.flush();
-        em.getTransaction().commit();
-        em.close();
-        JPAUtil.shutdown();
-    }
-
-    private void assertProductWasCreated() throws IOException {
-        em = JPAUtil.createEntityManager();
-        Query query = em.createQuery("SELECT c FROM Product c");
-        List<Product> results = query.getResultList();
-        assertNotNull(results);
-        assertEquals(1,results.size());
-        // TODO assert productDataBase
-    }
-
-    private void persistProductsDataBase() throws IOException {
-        em = JPAUtil.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("DELETE FROM Image").executeUpdate();
-        em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        instanciateProductOneWithImages();
-        em.persist(productOne);
-        em.flush();
-        em.getTransaction().commit();
-        em.close();
-        JPAUtil.shutdown();
-    }
-
-    private void instanciateProductOneWithImages() {
-        productOne = new Product("Primeiro Produto", "Primeiro Produto");
-        imagesProductOne = new ArrayList<Image>();
-        imagesProductOne.add(new Image(productOne));
-        imagesProductOne.add(new Image(productOne));
-        productOne.setImages(imagesProductOne);
-        // TODO Product Parent ?
     }
 }

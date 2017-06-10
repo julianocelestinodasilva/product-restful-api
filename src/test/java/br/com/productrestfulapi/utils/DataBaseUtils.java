@@ -31,10 +31,12 @@ public class DataBaseUtils {
         Product productDataBase = results.get(0);
         assertEquals(product.getName(),productDataBase.getName());
         assertEquals(product.getDescription(),productDataBase.getDescription());
-        assertEquals(product.getImages().get(0),productDataBase.getImages().get(0));
+        if (product.getImages() != null && product.getImages().size() > 0 ) {
+            assertEquals(product.getImages().get(0), productDataBase.getImages().get(0));
+        }
     }
 
-    public static void persistProductsDataBase(Object product) throws IOException {
+    public static void persistProductsDataBase(Product product) throws IOException {
         EntityManager em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
