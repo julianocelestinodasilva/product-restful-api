@@ -53,19 +53,19 @@ public class ProductResourceTest {
 
     @Test
     public void should_create_product() throws Exception {
-        clearProducts();
+        clearProductsDataBase();
         logger.log(Level.INFO, url);
         final String productName = "MyProduct";
         JSONObject productToCreate = getJsonProduct(productName);
         Response response = given().contentType("application/json").and().body(productToCreate.toString()).post(url);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Created",response.jsonPath().get("messageReturn"));
-        assertProductwasCreated();
+        assertProductWasCreated();
     }
 
     @Test
     public void should_delete_product() throws Exception {
-        persistProducts();
+        persistProductsDataBase();
         final long productId = productOne.getId();
         String urlDelete = url + "/" + productId;
         logger.log(Level.INFO, urlDelete);
@@ -115,7 +115,7 @@ public class ProductResourceTest {
         return productToCreate;
     }
 
-    private void clearProducts() throws IOException {
+    private void clearProductsDataBase() throws IOException {
         em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
@@ -126,7 +126,7 @@ public class ProductResourceTest {
         JPAUtil.shutdown();
     }
 
-    private void assertProductwasCreated() throws IOException {
+    private void assertProductWasCreated() throws IOException {
         em = JPAUtil.createEntityManager();
         Query query = em.createQuery("SELECT c FROM Product c");
         List<Product> results = query.getResultList();
@@ -134,12 +134,12 @@ public class ProductResourceTest {
         assertEquals(1,results.size());
     }
 
-    private void persistProducts() throws IOException {
+    private void persistProductsDataBase() throws IOException {
         em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
-        createProductOne();
+        createProductOneWithImages();
         em.persist(productOne);
         em.flush();
         em.getTransaction().commit();
@@ -147,11 +147,12 @@ public class ProductResourceTest {
         JPAUtil.shutdown();
     }
 
-    private void createProductOne() {
+    private void createProductOneWithImages() {
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
         imagesProductOne = new ArrayList<Image>();
         imagesProductOne.add(new Image(productOne));
         imagesProductOne.add(new Image(productOne));
         productOne.setImages(imagesProductOne);
+        // TODO Product Parent ?
     }
 }
