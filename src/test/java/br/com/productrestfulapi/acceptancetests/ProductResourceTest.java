@@ -89,7 +89,6 @@ public class ProductResourceTest {
         JPAUtil.shutdown();
         logger.log(Level.INFO, url);
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
-        // TODO Product Parent ?
         final String productName = productOne.getName();
         JSONObject productToCreate = getJsonProduct(productOne);
         Response response = given().contentType("application/json").and().body(productToCreate.toString()).post(url);
