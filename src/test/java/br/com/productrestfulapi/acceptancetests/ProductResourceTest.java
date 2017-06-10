@@ -57,10 +57,10 @@ public class ProductResourceTest {
         deleteProductsDataBase();
         instanciateProductOneWithImages();
         final long id = DataBaseUtils.persistProductsDataBaseAndGetId(productOne);
+        JPAUtil.shutdown();
         logger.log(Level.INFO, url);
         final String productName = "Namde Update";
         JSONObject productToUpdate = getJsonProduct(productName,id);
-        productToUpdate.put("id",9999L);
         Response response = given().contentType("application/json").and().body(productToUpdate.toString()).put(url);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Updated",response.jsonPath().get("messageReturn"));

@@ -12,6 +12,7 @@ import java.util.List;
 @Table(name="product")
 public class Product implements Serializable {
 
+    public static final String ID_WAS_NOT_INFORMED = "id was not informed !";
     public static final String NAME_OR_DESCRIPTION_WAS_NOT_INFORMED = "name or description was not informed !";
     public static final String PRODUCT_WAS_NOT_INFORMED = "Product was not informed !";
 
@@ -58,32 +59,6 @@ public class Product implements Serializable {
         this.id = id;
     }
 
-    public static Product getFromJSONObject(JSONObject json) throws IllegalArgumentException {
-        if (json == null) {
-            throw new IllegalArgumentException(PRODUCT_WAS_NOT_INFORMED);
-        }
-        if (!json.has("name") || !json.has("description")) {
-            throw new IllegalArgumentException(NAME_OR_DESCRIPTION_WAS_NOT_INFORMED);
-        } else {
-            try {
-                String name = json.getString("name");
-                String description = json.getString("description");
-                Product product = new Product(name,description);
-                if (json.has("parent")) {
-                    Product parent = (Product) json.get("parent");
-                    product.setParent(parent);
-                }
-                if (json.has("images")) {
-                    List<Image> images = (List<Image>) json.get("images");
-                    product.setImages(images);
-                }
-                return product;
-            } catch (JSONException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-    }
-
     @Override
     public String toString() {
         return "Product{" +
@@ -115,6 +90,53 @@ public class Product implements Serializable {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         return result;
+    }
+
+    public static Product getFromJSONToUpdate(JSONObject json) throws IllegalArgumentException {
+        verifyFieldsNotNull(json);
+        try {
+            Product product = getFromJSON(json);
+            if (!json.has("id") || json.getLong("id") < 1) {
+                throw new IllegalArgumentException(ID_WAS_NOT_INFORMED);
+            }
+            product.setId(json.getLong("id"));
+            return product;
+        } catch (JSONException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static Product getFromJSONToCreate(JSONObject json) throws IllegalArgumentException {
+        verifyFieldsNotNull(json);
+        try {
+            return getFromJSON(json);
+        } catch (JSONException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private static Product getFromJSON(JSONObject json) throws JSONException {
+        String name = json.getString("name");
+        String description = json.getString("description");
+        Product product = new Product(name, description);
+        if (json.has("parent")) {
+            Product parent = (Product) json.get("parent");
+            product.setParent(parent);
+        }
+        if (json.has("images")) {
+            List<Image> images = (List<Image>) json.get("images");
+            product.setImages(images);
+        }
+        return product;
+    }
+
+    private static void verifyFieldsNotNull(JSONObject json) {
+        if (json == null) {
+            throw new IllegalArgumentException(PRODUCT_WAS_NOT_INFORMED);
+        }
+        if (!json.has("name") || !json.has("description")) {
+            throw new IllegalArgumentException(NAME_OR_DESCRIPTION_WAS_NOT_INFORMED);
+        }
     }
 
     public void setId(long id) {

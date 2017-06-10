@@ -43,12 +43,32 @@ public class ProductResource {
         }
     }
 
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public JSONObject update(JSONObject productJson) throws JSONException, IOException {
+        try {
+            Product product = Product.getFromJSONToUpdate(productJson);
+            repository.update(product);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("messageReturn","Product "+product.getName()+" was Updated");
+            return jsonObject;
+        } catch (IllegalArgumentException e) {
+            logger.log (Level.WARNING, e.getMessage());
+            messageReturn.put("messageReturn", e.getMessage());
+            throw new BadRequestException(messageReturn);
+        } finally {
+            em.close();
+            JPAUtil.shutdown();
+        }
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public JSONObject create(JSONObject productJson) throws JSONException, IOException {
         try {
-            Product product = Product.getFromJSONObject(productJson);
+            Product product = Product.getFromJSONToCreate(productJson);
             repository.create(product);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("messageReturn", "Product " + product.getName()+ " was Created");
@@ -79,20 +99,6 @@ public class ProductResource {
             em.close();
             JPAUtil.shutdown();
         }
-    }
-
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONObject update(JSONObject product) throws JSONException, IOException {
-        if (product.has("id") && product.has("name")  && product.has("description")) {
-            String productName = product.getString("name");
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("messageReturn","Product "+productName+" was Updated");
-            JPAUtil.shutdown();
-            return jsonObject;
-        }
-        return null; // TODO status code
     }
 
     @GET
