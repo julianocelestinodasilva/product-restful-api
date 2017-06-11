@@ -17,7 +17,6 @@ public class Image implements Serializable {
     private Product product;
 
     public Image(Product product) {
-        this.id = id;
         this.product = product;
     }
 

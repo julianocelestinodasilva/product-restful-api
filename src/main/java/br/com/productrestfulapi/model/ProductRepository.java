@@ -15,10 +15,11 @@ public class ProductRepository {
         this.em = em;
     }
 
-    public List<Product> getAll() {
+    public List<Product> get() {
         List<Product> products = new ArrayList<Product>();
 
         Product productWithImages = new Product("ProductWithImages", "Product with images");
+        productWithImages.setId(251L);
         List<Image> images = new ArrayList<Image>();
         images.add(new Image(productWithImages));
         productWithImages.setImages(images);

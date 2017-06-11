@@ -50,32 +50,14 @@ public class ProductResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONArray getAllIncludingRelationships() throws JSONException {
+    public JSONArray get() throws JSONException {
         try {
-            JSONArray jsonObject = new JSONArray();
-            List<Product> products = repository.getAll();
+            List<Product> products = repository.get();
             if (products == null || products.size() < 1) {
                 messageReturn.put("messageReturn", "Products not Found");
                 throw new NotFoundException(messageReturn);
             }
-            for (Product product : products) {
-                JSONObject productJson = new JSONObject();
-                productJson.put("name", product.getName());
-                productJson.put("description", product.getDescription());
-                Product parent = product.getParent();
-                if (parent != null) {
-                    productJson.put("parentProductId", parent.getId());
-                }
-                List<Long> imagesId = new ArrayList<Long>();
-                final List<Image> images = product.getImages();
-                if (images != null) {
-                    for (Image image : images) {
-                        imagesId.add(image.getId());
-                    }
-                    productJson.put("images", imagesId);
-                }
-            }
-            return jsonObject;
+            return createJsonArray(products);
         } finally {
             em.close();
             shutdown();
@@ -98,7 +80,7 @@ public class ProductResource {
             throw new BadRequestException(messageReturn);
         } finally {
             em.close();
-            JPAUtil.shutdown();
+            shutdown();
         }
     }
 
@@ -118,7 +100,7 @@ public class ProductResource {
             throw new BadRequestException(messageReturn);
         } finally {
             em.close();
-            JPAUtil.shutdown();
+            shutdown();
         }
     }
 
@@ -136,8 +118,31 @@ public class ProductResource {
             return messageReturn;
         } finally {
             em.close();
-            JPAUtil.shutdown();
+            shutdown();
         }
+    }
+
+    private JSONArray createJsonArray(List<Product> products) throws JSONException {
+        JSONArray jsonObject = new JSONArray();
+        for (Product product : products) {
+            JSONObject productJson = new JSONObject();
+            productJson.put("name", product.getName());
+            productJson.put("description", product.getDescription());
+            Product parent = product.getParent();
+            if (parent != null && parent.getId() > 0) {
+                productJson.put("parentProductId", parent.getId());
+            }
+            List<Long> imagesId = new ArrayList<Long>();
+            final List<Image> images = product.getImages();
+            if (images != null) {
+                for (Image image : images) {
+                    imagesId.add(image.getId());
+                }
+                productJson.put("images", imagesId);
+            }
+            jsonObject.put(productJson);
+        }
+        return jsonObject;
     }
 
     private void shutdown() throws JSONException {
