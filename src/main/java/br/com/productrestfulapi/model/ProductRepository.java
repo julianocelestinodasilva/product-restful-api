@@ -1,6 +1,8 @@
 package br.com.productrestfulapi.model;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,19 +18,10 @@ public class ProductRepository {
     }
 
     public List<Product> get() {
-        List<Product> products = new ArrayList<Product>();
-
-        Product productWithImages = new Product("ProductWithImages", "Product with images");
-        productWithImages.setId(251L);
-        List<Image> images = new ArrayList<Image>();
-        images.add(new Image(productWithImages));
-        productWithImages.setImages(images);
-        products.add(productWithImages);
-
-        Product productWithParent = new Product("ProductWithParent", "Product with parent",productWithImages);
-        products.add(productWithParent);
-
-        return products;
+        CriteriaQuery<Product> criteria = em.getCriteriaBuilder().createQuery(Product.class);
+        Root<Product> root = criteria.from(Product.class);
+        criteria.select(root);
+        return em.createQuery(criteria).getResultList();
     }
 
     public void update(Product product) {

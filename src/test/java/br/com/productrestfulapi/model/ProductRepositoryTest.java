@@ -82,7 +82,7 @@ public class ProductRepositoryTest {
         assertEquals(productWithImages.getDescription(),product1.getDescription());
         assertNotNull(product1.getImages());
         assertEquals(1,product1.getImages().size());
-        // TODO assertTrue(product1.getImages().get(0).getId() > 0);
+        assertTrue(product1.getImages().get(0).getId() > 0);
     }
 
 }
