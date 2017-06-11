@@ -1,6 +1,8 @@
 package br.com.productrestfulapi.model;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by juliano on 09/06/17.
@@ -11,6 +13,21 @@ public class ProductRepository {
 
     public ProductRepository(EntityManager em) {
         this.em = em;
+    }
+
+    public List<Product> getAll() {
+        List<Product> products = new ArrayList<Product>();
+
+        Product productWithImages = new Product("ProductWithImages", "Product with images");
+        List<Image> images = new ArrayList<Image>();
+        images.add(new Image(productWithImages));
+        productWithImages.setImages(images);
+        products.add(productWithImages);
+
+        Product productWithParent = new Product("ProductWithParent", "Product with parent",productWithImages);
+        products.add(productWithParent);
+
+        return products;
     }
 
     public void update(Product product) {

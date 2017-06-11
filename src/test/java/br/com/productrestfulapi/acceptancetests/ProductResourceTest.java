@@ -58,7 +58,7 @@ public class ProductResourceTest {
                 body("size()", is(2)).
                 body("get(0).name", equalTo(productWithImages.getName())).
                 body("get(0).description", equalTo(productWithImages.getDescription())).
-                body("get(0).image", equalTo(productWithImages.getImages().get(0).getId())).
+                body("get(0).images.size()", equalTo(1)).
                 body("get(1).name", equalTo(productWithParent.getName())).
                 body("get(1).description", equalTo(productWithParent.getDescription())).
                 body("get(1).parentProductId", equalTo(productWithParent.getParent().getId())).
