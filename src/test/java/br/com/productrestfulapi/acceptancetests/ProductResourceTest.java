@@ -7,6 +7,7 @@ import io.restassured.response.Response;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
@@ -19,7 +20,6 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -39,6 +39,12 @@ public class ProductResourceTest {
     @Before
     public void setUp() throws Exception {
         url = "http://localhost:8080/productAPI/product";
+    }
+
+    @Test
+    @Ignore
+    public void get_all_products_excluding_relationships() throws Exception {
+
     }
 
     @Test
@@ -66,9 +72,10 @@ public class ProductResourceTest {
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
         final long id = DataBaseUtils.persistProductsAndGetId(productOne);
         JPAUtil.shutdown();
+        url = url + "/" + id;
         logger.log(Level.INFO, url);
         final String productName = "Namde Update";
-        JSONObject productToUpdate = getJsonProduct(productName,id);
+        JSONObject productToUpdate = getJsonProduct(productName);
         Response response = given().contentType("application/json").and().body(productToUpdate.toString()).put(url);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Updated",response.jsonPath().get("messageReturn"));
@@ -104,9 +111,8 @@ public class ProductResourceTest {
         assertNull(em.find(Product.class, productId));
     }
 
-    private JSONObject getJsonProduct(String productName, long id) throws JSONException {
+    private JSONObject getJsonProduct(String productName) throws JSONException {
         JSONObject productToCreate = new JSONObject();
-        productToCreate.put("id", id);
         productToCreate.put("name", productName);
         productToCreate.put("description","This is my product");
         // TODO productToCreate.put("parentProductID","");

@@ -1,6 +1,5 @@
 package br.com.productrestfulapi.model;
 
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.persistence.*;
@@ -29,11 +28,11 @@ public class Product implements Serializable {
     private List<Image> images;
 
     @Column(name="name",length=30,nullable=false)
-    @NotNull(message="The model.Product name can not be null!")
+    @NotNull(message="The Product name can not be null!")
     private String name;
 
     @Column(name="description",length=80,nullable=false)
-    @NotNull(message="The model.Product description can not be null!")
+    @NotNull(message="The Product description can not be null!")
     private String description;
 
     public Product(long id, Product parent, List<Image> images, String name, String description) {
@@ -92,43 +91,26 @@ public class Product implements Serializable {
         return result;
     }
 
-    public static Product getFromJSONToUpdate(JSONObject json) {
-        verifyFieldsNotNull(json);
-        verifyId(json);
-        try {
-            Product product = getFromJSON(json);
-            product.setId(json.getLong("id"));
-            return product;
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+    public static Product getFromJSON(long id, JSONObject json) {
+        if (id < 1) {
+            throw new IllegalArgumentException(ID_WAS_NOT_INFORMED);
         }
-    }
-
-    public static Product getFromJSONToCreate(JSONObject json) {
-        verifyFieldsNotNull(json);
-        try {
-            return getFromJSON(json);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private static Product getFromJSON(JSONObject jsonProduct) throws JSONException {
-        String name = jsonProduct.getString("name");
-        String description = jsonProduct.getString("description");
-        Product product = new Product(name, description);
-        if (jsonProduct.has("parent")) {
-            Product parent = (Product) jsonProduct.get("parent");
-            product.setParent(parent);
-        }
+        Product product = getFromJSON(json);
+        product.setId(id);
         return product;
     }
 
-    private static void verifyId(JSONObject json) {
+    public static Product getFromJSON(JSONObject jsonProduct) {
+        verifyFieldsNotNull(jsonProduct);
         try {
-            if (!json.has("id") || json.getLong("id") < 1) {
-                throw new IllegalArgumentException(ID_WAS_NOT_INFORMED);
+            String name = jsonProduct.getString("name");
+            String description = jsonProduct.getString("description");
+            Product product = new Product(name, description);
+            if (jsonProduct.has("parent")) {
+                Product parent = (Product) jsonProduct.get("parent");
+                product.setParent(parent);
             }
+            return product;
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

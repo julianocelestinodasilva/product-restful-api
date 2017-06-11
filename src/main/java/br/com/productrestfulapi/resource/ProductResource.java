@@ -50,7 +50,7 @@ public class ProductResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONArray get() throws JSONException {
+    public JSONArray getAndRelationships() throws JSONException {
         try {
             List<Product> products = repository.get();
             if (products == null || products.size() < 1) {
@@ -67,9 +67,10 @@ public class ProductResource {
     @PUT
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONObject update(JSONObject productJson) throws JSONException {
+    @Path("/{id}")
+    public JSONObject update(@PathParam("id") long id,JSONObject productJson) throws JSONException {
         try {
-            Product product = Product.getFromJSONToUpdate(productJson);
+            Product product = Product.getFromJSON(id,productJson);
             repository.update(product);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("messageReturn","Product "+product.getName()+" was Updated");
@@ -89,7 +90,7 @@ public class ProductResource {
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public JSONObject create(JSONObject productJson) throws JSONException {
         try {
-            Product product = Product.getFromJSONToCreate(productJson);
+            Product product = Product.getFromJSON(productJson);
             repository.create(product);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("messageReturn", "Product " + product.getName()+ " was Created");
