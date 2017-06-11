@@ -50,7 +50,8 @@ public class ProductResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONArray getAndRelationships() throws JSONException {
+    @Path("/and-relationships")
+    public JSONArray getWithRelationships() throws JSONException {
         try {
             List<Product> products = repository.get();
             if (products == null || products.size() < 1) {

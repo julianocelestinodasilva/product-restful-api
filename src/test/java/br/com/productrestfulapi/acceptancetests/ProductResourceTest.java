@@ -42,9 +42,13 @@ public class ProductResourceTest {
     }
 
     @Test
-    @Ignore
     public void get_all_products_excluding_relationships() throws Exception {
+        List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
+        JPAUtil.shutdown();
+        Product productWithImages = productsWithRelationships.get(0);
+        Product productWithParent = productsWithRelationships.get(1);
 
+        logger.log(Level.INFO, url);
     }
 
     @Test
@@ -53,6 +57,7 @@ public class ProductResourceTest {
         JPAUtil.shutdown();
         Product productWithImages = productsWithRelationships.get(0);
         Product productWithParent = productsWithRelationships.get(1);
+        url = url + "/" + "and-relationships";
         logger.log(Level.INFO, url);
         final int id = Math.toIntExact(productWithParent.getParent().getId());
         expect().statusCode(200).
