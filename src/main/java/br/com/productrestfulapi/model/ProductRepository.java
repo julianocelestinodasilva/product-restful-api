@@ -17,6 +17,10 @@ public class ProductRepository {
         this.em = em;
     }
 
+    public Product get(long id) {
+        return em.find(Product.class,id);
+    }
+
     public List<Product> get() {
         CriteriaQuery<Product> criteria = em.getCriteriaBuilder().createQuery(Product.class);
         Root<Product> root = criteria.from(Product.class);

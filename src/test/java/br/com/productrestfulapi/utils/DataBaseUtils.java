@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by juliano on 10/06/17.
@@ -53,8 +54,9 @@ public class DataBaseUtils {
         Product productDataBase = results.get(0);
         assertEquals(product.getName(),productDataBase.getName());
         assertEquals(product.getDescription(),productDataBase.getDescription());
-        if (product.getImages() != null && product.getImages().size() > 0 ) {
-            assertEquals(product.getImages().get(0), productDataBase.getImages().get(0));
+        Product parent = product.getParent();
+        if (parent != null) {
+            assertTrue(parent.getId() == productDataBase.getParent().getId());
         }
     }
 

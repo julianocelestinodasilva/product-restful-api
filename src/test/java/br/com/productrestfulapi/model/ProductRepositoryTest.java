@@ -27,6 +27,15 @@ public class ProductRepositoryTest {
     }
 
     @Test
+    public void get_product_by_identity_including_specified_relationships() throws Exception {
+        List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
+        Product productWithImages = productsWithRelationships.get(0);
+        Product product = repository.get(productWithImages.getId());
+        assertNotNull(product);
+        assertProductWithImages(productWithImages, product);
+    }
+
+    @Test
     public void get_all_products_including_specified_relationships() throws Exception {
         List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
         Product productWithImages = productsWithRelationships.get(0);
@@ -85,4 +94,11 @@ public class ProductRepositoryTest {
         assertTrue(product1.getImages().get(0).getId() > 0);
     }
 
+    private void assertProductWithImages(Product productWithImages, Product productFound) {
+        assertEquals(productWithImages.getName(),productFound.getName());
+        assertEquals(productWithImages.getDescription(),productFound.getDescription());
+        assertNotNull(productFound.getImages());
+        assertEquals(1,productFound.getImages().size());
+        assertTrue(productFound.getImages().get(0).getId() > 0);
+    }
 }

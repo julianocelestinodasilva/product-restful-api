@@ -45,6 +45,23 @@ public class ProductResourceTest {
     }
 
     @Test
+    public void get_product_by_identity_including_specified_relationships() throws Exception {
+        List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
+        JPAUtil.shutdown();
+        Product productWithImages = productsWithRelationships.get(0);
+        long id = productWithImages.getId();
+        url = url + "/" + "and-relationships" + "/" + id;
+        logger.log(Level.INFO, url);
+        expect().statusCode(200).
+                body("id", notNullValue()).
+                body("name", equalTo(productWithImages.getName())).
+                body("description", equalTo(productWithImages.getDescription())).
+                body("images.size()", equalTo(1)).
+                body("parentProductId", isEmptyOrNullString()).
+                when().get(url);
+    }
+
+    @Test
     public void get_all_products_excluding_relationships() throws Exception {
         List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
         JPAUtil.shutdown();

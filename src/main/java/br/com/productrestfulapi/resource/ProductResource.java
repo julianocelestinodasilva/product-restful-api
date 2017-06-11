@@ -24,8 +24,6 @@ import java.util.logging.Logger;
  * Created by juliano on 06/06/17.
  */
 
-// TODO IOException --> InternalServerErrorException
-
 @Path("/product")
 public class ProductResource {
 
@@ -50,6 +48,23 @@ public class ProductResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Path("/and-relationships/{id}")
+    public JSONObject getWithRelationships(@PathParam("id") long id) throws JSONException {
+        try {
+            Product product = repository.get(id);
+            if (product == null) {
+                messageReturn.put("messageReturn", "Product not Found");
+                throw new NotFoundException(messageReturn);
+            }
+            return createJSONObject(product,true);
+        } finally {
+            em.close();
+            shutdown();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public JSONArray get() throws JSONException {
         try {
             List<Product> products = repository.get();
@@ -57,7 +72,7 @@ public class ProductResource {
                 messageReturn.put("messageReturn", "Products not Found");
                 throw new NotFoundException(messageReturn);
             }
-            return createJsonArray(products,false);
+            return createJSONArray(products,false);
         } finally {
             em.close();
             shutdown();
@@ -74,7 +89,7 @@ public class ProductResource {
                 messageReturn.put("messageReturn", "Products not Found");
                 throw new NotFoundException(messageReturn);
             }
-            return createJsonArray(products,true);
+            return createJSONArray(products,true);
         } finally {
             em.close();
             shutdown();
@@ -140,30 +155,39 @@ public class ProductResource {
         }
     }
 
-    private JSONArray createJsonArray(List<Product> products, boolean withRelationships) throws JSONException {
+    private JSONArray createJSONArray(List<Product> products, boolean withRelationships) throws JSONException {
         JSONArray jsonObject = new JSONArray();
         for (Product product : products) {
-            JSONObject productJson = new JSONObject();
-            productJson.put("id", product.getId());
-            productJson.put("name", product.getName());
-            productJson.put("description", product.getDescription());
-            if (withRelationships) {
-                Product parent = product.getParent();
-                if (parent != null && parent.getId() > 0) {
-                    productJson.put("parentProductId", parent.getId());
-                }
-                List<Long> imagesId = new ArrayList<Long>();
-                final List<Image> images = product.getImages();
-                if (images != null) {
-                    for (Image image : images) {
-                        imagesId.add(image.getId());
-                    }
-                    productJson.put("images", imagesId);
-                }
-            }
+            JSONObject productJson = createJSONObject(product,withRelationships);
             jsonObject.put(productJson);
         }
         return jsonObject;
+    }
+
+    private JSONObject createJSONObject(Product product, boolean withRelationships) throws JSONException {
+        JSONObject productJson = new JSONObject();
+        productJson.put("id", product.getId());
+        productJson.put("name", product.getName());
+        productJson.put("description", product.getDescription());
+        if (withRelationships) {
+            Product parent = product.getParent();
+            if (parent != null && parent.getId() > 0) {
+                productJson.put("parentProductId", parent.getId());
+            }
+            putImages(product, productJson);
+        }
+        return productJson;
+    }
+
+    private void putImages(Product product, JSONObject productJson) throws JSONException {
+        List<Long> imagesId = new ArrayList<Long>();
+        final List<Image> images = product.getImages();
+        if (images != null) {
+            for (Image image : images) {
+                imagesId.add(image.getId());
+            }
+            productJson.put("images", imagesId);
+        }
     }
 
     private void shutdown() throws JSONException {
