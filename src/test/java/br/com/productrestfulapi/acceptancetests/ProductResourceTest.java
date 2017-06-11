@@ -35,8 +35,6 @@ public class ProductResourceTest {
     private EntityManager em;
 
     private Product productOne;
-    private Product productTwo;
-    private Product productWithParent;
 
     @Before
     public void setUp() throws Exception {
@@ -50,6 +48,7 @@ public class ProductResourceTest {
         Product productWithImages = productsWithRelationships.get(0);
         Product productWithParent = productsWithRelationships.get(1);
         logger.log(Level.INFO, url);
+        final int id = Math.toIntExact(productWithParent.getParent().getId());
         expect().statusCode(200).
                 body("size()", is(2)).
                 body("get(0).name", equalTo(productWithImages.getName())).
@@ -57,7 +56,7 @@ public class ProductResourceTest {
                 body("get(0).images.size()", equalTo(1)).
                 body("get(1).name", equalTo(productWithParent.getName())).
                 body("get(1).description", equalTo(productWithParent.getDescription())).
-                //TODO body("get(1).parentProductId", equalTo(productWithParent.getParent().getId())).
+                body("get(1).parentProductId", equalTo(id)).
                 when().get(url);
     }
 

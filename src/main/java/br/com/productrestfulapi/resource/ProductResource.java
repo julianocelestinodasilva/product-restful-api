@@ -67,7 +67,7 @@ public class ProductResource {
     @PUT
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONObject update(JSONObject productJson) throws JSONException, IOException {
+    public JSONObject update(JSONObject productJson) throws JSONException {
         try {
             Product product = Product.getFromJSONToUpdate(productJson);
             repository.update(product);
@@ -87,7 +87,7 @@ public class ProductResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public JSONObject create(JSONObject productJson) throws JSONException, IOException {
+    public JSONObject create(JSONObject productJson) throws JSONException {
         try {
             Product product = Product.getFromJSONToCreate(productJson);
             repository.create(product);
@@ -107,7 +107,7 @@ public class ProductResource {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/{id}")
-    public JSONObject delete(@PathParam("id") long id) throws JSONException, IOException {
+    public JSONObject delete(@PathParam("id") long id) throws JSONException {
         try {
             boolean wasDeleted = repository.delete(id);
             if (!wasDeleted) {
