@@ -6,6 +6,7 @@ import br.com.productrestfulapi.utils.DataBaseUtils;
 import io.restassured.response.Response;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,6 +20,8 @@ import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -47,8 +50,17 @@ public class ProductResourceTest {
         JPAUtil.shutdown();
         Product productWithImages = productsWithRelationships.get(0);
         Product productWithParent = productsWithRelationships.get(1);
-
         logger.log(Level.INFO, url);
+        expect().statusCode(200).
+                body("size()", is(2)).
+                body("get(0).id", notNullValue()).
+                body("get(0).name", equalTo(productWithImages.getName())).
+                body("get(0).description", equalTo(productWithImages.getDescription())).
+                body("get(0).images", isEmptyOrNullString()).
+                body("get(1).name", equalTo(productWithParent.getName())).
+                body("get(1).description", equalTo(productWithParent.getDescription())).
+                body("get(1).parentProductId", isEmptyOrNullString()).
+                when().get(url);
     }
 
     @Test
@@ -62,6 +74,7 @@ public class ProductResourceTest {
         final int id = Math.toIntExact(productWithParent.getParent().getId());
         expect().statusCode(200).
                 body("size()", is(2)).
+                body("get(0).id", notNullValue()).
                 body("get(0).name", equalTo(productWithImages.getName())).
                 body("get(0).description", equalTo(productWithImages.getDescription())).
                 body("get(0).images.size()", equalTo(1)).
