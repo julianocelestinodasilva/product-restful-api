@@ -7,7 +7,9 @@ import org.junit.Test;
 
 import javax.persistence.EntityManager;
 
-import static org.junit.Assert.assertNull;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by juliano on 09/06/17.
@@ -17,12 +19,23 @@ public class ProductRepositoryTest {
     private EntityManager em;
 
     private Product product;
-    // TODO private List<Image> imagesProduct;
     private ProductRepository repository;
 
     @Before
     public void setUp() throws Exception {
         repository = new ProductRepository(JPAUtil.createEntityManager());
+    }
+
+    @Test
+    public void get_all_products_including_specified_relationships() throws Exception {
+        List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
+        Product productWithImages = productsWithRelationships.get(0);
+        Product productWithParent = productsWithRelationships.get(1);
+        List<Product> products = repository.get();
+        assertNotNull(products);
+        assertEquals(2,products.size());
+        assertProductWithImages(productWithImages, products);
+        assertProductWithParent(productWithParent, products);
     }
 
     @Test
@@ -53,6 +66,23 @@ public class ProductRepositoryTest {
         repository.delete(productId);
         em = JPAUtil.createEntityManager();
         assertNull(em.find(Product.class, productId));
+    }
+
+    private void assertProductWithParent(Product productWithParent, List<Product> products) {
+        Product product2 = products.get(1);
+        assertEquals(productWithParent.getName(),product2.getName());
+        assertEquals(productWithParent.getDescription(),product2.getDescription());
+        assertNotNull(product2.getParent());
+        assertTrue(product2.getParent().getId() > 0);
+    }
+
+    private void assertProductWithImages(Product productWithImages, List<Product> products) {
+        Product product1 = products.get(0);
+        assertEquals(productWithImages.getName(),product1.getName());
+        assertEquals(productWithImages.getDescription(),product1.getDescription());
+        assertNotNull(product1.getImages());
+        assertEquals(1,product1.getImages().size());
+        // TODO assertTrue(product1.getImages().get(0).getId() > 0);
     }
 
 }
