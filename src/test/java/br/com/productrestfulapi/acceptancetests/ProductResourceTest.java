@@ -7,11 +7,10 @@ import io.restassured.response.Response;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
-import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,30 +48,28 @@ public class ProductResourceTest {
     }
 
     @Test
-    @Ignore
     public void get_all_products_including_specified_relationships() throws Exception {
-        // java.lang.IllegalArgumentException: Path get(0).name is invalid.
+        List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
+        JPAUtil.shutdown();
+        Product productWithImages = productsWithRelationships.get(0);
+        Product productWithParent = productsWithRelationships.get(1);
         logger.log(Level.INFO, url);
         expect().statusCode(200).
                 body("size()", is(2)).
-                body("get(0).name", equalTo("Product0")).
-                body("get(0).description", equalTo("The Product0")).
-                body("get(0).parentProductId", equalTo(999)).
-                body("get(0).image", equalTo(1000)).
-                body("get(1).name", equalTo("Product1")).
-                body("get(1).description", equalTo("The Product1")).
-                body("get(1).parentProductId", equalTo(999)).
-                body("get(1).image", equalTo(1000)).
+                body("get(0).name", equalTo(productWithImages.getName())).
+                body("get(0).description", equalTo(productWithImages.getDescription())).
+                body("get(0).image", equalTo(productWithImages.getImages().get(0).getId())).
+                body("get(1).name", equalTo(productWithParent.getName())).
+                body("get(1).description", equalTo(productWithParent.getDescription())).
+                body("get(1).parentProductId", equalTo(productWithParent.getParent().getId())).
                 when().get(url);
-        // TODO Assert no Banco
     }
 
     @Test
     public void should_update_product() throws Exception {
-        DataBaseUtils.deleteProductsDataBase();
+        DataBaseUtils.deleteProducts();
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
-        // TODO Product Parent ?
-        final long id = DataBaseUtils.persistProductsDataBaseAndGetId(productOne);
+        final long id = DataBaseUtils.persistProductsAndGetId(productOne);
         JPAUtil.shutdown();
         logger.log(Level.INFO, url);
         final String productName = "Namde Update";
@@ -85,7 +82,7 @@ public class ProductResourceTest {
 
     @Test
     public void should_create_product() throws Exception {
-        DataBaseUtils.deleteProductsDataBase();
+        DataBaseUtils.deleteProducts();
         JPAUtil.shutdown();
         logger.log(Level.INFO, url);
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
@@ -100,7 +97,7 @@ public class ProductResourceTest {
     @Test
     public void should_delete_product() throws Exception {
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
-        DataBaseUtils.persistProductsDataBase(productOne);
+        DataBaseUtils.persistProducts(productOne);
         JPAUtil.shutdown();
         final long productId = productOne.getId();
         String urlDelete = url + "/" + productId;
