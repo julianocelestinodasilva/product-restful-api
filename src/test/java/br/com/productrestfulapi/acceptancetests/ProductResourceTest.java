@@ -45,6 +45,45 @@ public class ProductResourceTest {
     }
 
     @Test
+    public void get_product_by_identity_excluding_relationships() throws Exception {
+        List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
+        JPAUtil.shutdown();
+        Product productWithImages = productsWithRelationships.get(0);
+        long id = productWithImages.getId();
+        url = url + "/" + id;
+        logger.log(Level.INFO, url);
+        expect().statusCode(200).
+                body("id", notNullValue()).
+                body("name", equalTo(productWithImages.getName())).
+                body("description", equalTo(productWithImages.getDescription())).
+                body("images", isEmptyOrNullString()).
+                body("parentProductId", isEmptyOrNullString()).
+                when().get(url);
+    }
+
+    @Test
+    public void get_all_products_excluding_relationships() throws Exception {
+        List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
+        JPAUtil.shutdown();
+        Product productWithImages = productsWithRelationships.get(0);
+        Product productWithParent = productsWithRelationships.get(1);
+        logger.log(Level.INFO, url);
+        expect().statusCode(200).
+                body("size()", is(2)).
+                body("get(0).id", notNullValue()).
+                body("get(0).name", equalTo(productWithImages.getName())).
+                body("get(0).description", equalTo(productWithImages.getDescription())).
+                body("get(0).parentProductId", isEmptyOrNullString()).
+                body("get(0).images", isEmptyOrNullString()).
+                body("get(1).id", notNullValue()).
+                body("get(1).name", equalTo(productWithParent.getName())).
+                body("get(1).description", equalTo(productWithParent.getDescription())).
+                body("get(1).parentProductId", isEmptyOrNullString()).
+                body("get(1).images", isEmptyOrNullString()).
+                when().get(url);
+    }
+
+    @Test
     public void get_product_by_identity_including_specified_relationships() throws Exception {
         List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
         JPAUtil.shutdown();
@@ -62,25 +101,6 @@ public class ProductResourceTest {
     }
 
     @Test
-    public void get_all_products_excluding_relationships() throws Exception {
-        List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
-        JPAUtil.shutdown();
-        Product productWithImages = productsWithRelationships.get(0);
-        Product productWithParent = productsWithRelationships.get(1);
-        logger.log(Level.INFO, url);
-        expect().statusCode(200).
-                body("size()", is(2)).
-                body("get(0).id", notNullValue()).
-                body("get(0).name", equalTo(productWithImages.getName())).
-                body("get(0).description", equalTo(productWithImages.getDescription())).
-                body("get(0).images", isEmptyOrNullString()).
-                body("get(1).name", equalTo(productWithParent.getName())).
-                body("get(1).description", equalTo(productWithParent.getDescription())).
-                body("get(1).parentProductId", isEmptyOrNullString()).
-                when().get(url);
-    }
-
-    @Test
     public void get_all_products_including_specified_relationships() throws Exception {
         List<Product> productsWithRelationships = DataBaseUtils.persistProductsWithRelationships();
         JPAUtil.shutdown();
@@ -94,10 +114,13 @@ public class ProductResourceTest {
                 body("get(0).id", notNullValue()).
                 body("get(0).name", equalTo(productWithImages.getName())).
                 body("get(0).description", equalTo(productWithImages.getDescription())).
+                body("get(0).parentProductId", isEmptyOrNullString()).
                 body("get(0).images.size()", equalTo(1)).
+                body("get(1).id", notNullValue()).
                 body("get(1).name", equalTo(productWithParent.getName())).
                 body("get(1).description", equalTo(productWithParent.getDescription())).
                 body("get(1).parentProductId", equalTo(id)).
+                body("get(1).images.size()", equalTo(0)).
                 when().get(url);
     }
 
