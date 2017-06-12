@@ -23,14 +23,6 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>5.2.10.Final</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.0-api -->
-        <!-- classpath  <dependency>
-            <groupIdconvlict>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>1.0.1.Final</version>
-        </dependency>-->
-
         <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
         <dependency>
             <groupId>javax.validation</groupId>
@@ -71,9 +63,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <!--3) The application must start with a Maven command: mvn exec:java, mvn jetty:run, mvn spring-boot:run, etc.-->
-    <!--http://www.eclipse.org/jetty/documentation/9.4.x/maven-and-jetty.html-->
 
    <properties>
        <maven.compiler.source>1.8</maven.compiler.source>
