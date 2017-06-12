@@ -39,9 +39,27 @@ public class ImageResourceTest {
     }
 
     @Test
+    public void should_update_product() throws Exception {
+        product = new Product("Primeiro Produto", "Primeiro Produto");
+        image = DataBaseUtils.deleteEntitiesAndPersistImageAndProduct(product);
+        product = new Product("Outro Produto", "Outro Produto");
+        final long idProduct = DataBaseUtils.persistProductAndGetId(product);
+        product.setId(idProduct);
+        image.setProduct(product);
+        JPAUtil.shutdown();
+        url = url + "/" + image.getId();
+        logger.log(Level.INFO, url);
+        JSONObject json = getJson(product);
+        Response response = given().contentType("application/json").and().body(json.toString()).put(url);
+        assertEquals(200,response.getStatusCode());
+        assertEquals("Image was Updated",response.jsonPath().get("messageReturn"));
+        DataBaseUtils.assertImageWasUpdated(product);
+    }
+
+    @Test
     public void should_delete_image() throws Exception {
         product = new Product("Primeiro Produto", "Primeiro Produto");
-        image = DataBaseUtils.persistImageAndProduct(product);
+        image = DataBaseUtils.deleteEntitiesAndPersistImageAndProduct(product);
         JPAUtil.shutdown();
         final long imageId = image.getId();
         String urlDelete = url + "/" + imageId;

@@ -47,6 +47,14 @@ public class DataBaseUtils {
         assertEquals(newName,productDataBase.getName());
     }
 
+    public static void assertImageWasUpdated(Product newProduct) throws IOException {
+        List<Image> results = getImages();
+        assertNotNull(results);
+        assertEquals(1,results.size());
+        Image imageDataBase = results.get(0);
+        assertTrue(newProduct.getId() == imageDataBase.getProduct().getId());
+    }
+
     public static  void assertWasCreated(Product product) throws IOException {
         List<Product> results = getProducts();
         assertNotNull(results);
@@ -78,18 +86,18 @@ public class DataBaseUtils {
         em.getTransaction().commit();
     }
 
-    public static Image persistImageAndProduct(Product product) throws IOException {
+    public static Image deleteEntitiesAndPersistImageAndProduct(Product product) throws IOException {
         EntityManager em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
         em.createNativeQuery("DELETE FROM Product").executeUpdate();
         final long id = persistProductAndGetId(product,em);
         product.setId(id);
-        final Image image = new Image(product);
-        em.persist(image);
+        em.persist(new Image(product));
         em.flush();
         em.getTransaction().commit();
-        return image;
+        final List<Image> images = getImages();
+        return images.get(0);
     }
 
     public static void deleteEntities() throws IOException {
@@ -110,6 +118,16 @@ public class DataBaseUtils {
         em.flush();
         em.getTransaction().commit();
         List<Product> results = getProducts();
+        return results.get(0).getId();
+    }
+
+    public static long persistProductAndGetId(Product product) throws IOException {
+        EntityManager em = JPAUtil.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(product);
+        em.flush();
+        em.getTransaction().commit();
+        List<Product> results = getProducts(em);
         return results.get(0).getId();
     }
 

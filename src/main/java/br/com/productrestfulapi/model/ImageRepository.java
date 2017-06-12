@@ -16,6 +16,13 @@ public class ImageRepository {
         this.em = em;
     }
 
+    public void update(Image product) {
+        verifyFieldsNotNull(product);
+        em.getTransaction().begin();
+        em.merge(product);
+        em.getTransaction().commit();
+    }
+
     public void create(Image image) {
         verifyFieldsNotNull(image);
         em.getTransaction().begin();

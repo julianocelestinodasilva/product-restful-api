@@ -47,6 +47,27 @@ public class ImageResource {
         }
     }
 
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Path("/{id}")
+    public JSONObject update(@PathParam("id") long id,JSONObject imageJson) throws JSONException {
+        try {
+            Image image = Image.getFromJSON(id,imageJson);
+            repository.update(image);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("messageReturn","Image was Updated");
+            return jsonObject;
+        } catch (IllegalArgumentException e) {
+            logger.log (Level.WARNING, e.getMessage());
+            messageReturn.put("messageReturn", e.getMessage());
+            throw new BadRequestException(messageReturn);
+        } finally {
+            em.close();
+            shutdown();
+        }
+    }
+
     @DELETE
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/{id}")

@@ -29,6 +29,15 @@ public class Image implements Serializable {
     public Image() {
     }
 
+    public static Image getFromJSON(long idImage, JSONObject json) {
+        if (idImage < 1) {
+            throw new IllegalArgumentException(ID_WAS_NOT_INFORMED);
+        }
+        Image image = getFromJSON(json);
+        image.setId(idImage);
+        return image;
+    }
+
     public static Image getFromJSON(JSONObject json) {
         verifyFieldsNotNull(json);
         try {
@@ -50,8 +59,16 @@ public class Image implements Serializable {
         }
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public long getId() {
         return id;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     @Override
