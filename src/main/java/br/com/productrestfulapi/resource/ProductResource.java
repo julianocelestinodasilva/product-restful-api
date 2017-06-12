@@ -48,6 +48,23 @@ public class ProductResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Path("/{id}")
+    public JSONObject get(@PathParam("id") long id) throws JSONException {
+        try {
+            Product product = repository.get(id);
+            if (product == null) {
+                messageReturn.put("messageReturn", "Product not Found");
+                throw new NotFoundException(messageReturn);
+            }
+            return createJSONObject(product,false);
+        } finally {
+            em.close();
+            shutdown();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/and-relationships/{id}")
     public JSONObject getWithRelationships(@PathParam("id") long id) throws JSONException {
         try {
@@ -174,12 +191,12 @@ public class ProductResource {
             if (parent != null && parent.getId() > 0) {
                 productJson.put("parentProductId", parent.getId());
             }
-            putImages(product, productJson);
+            putImagesOnJSONObject(product, productJson);
         }
         return productJson;
     }
 
-    private void putImages(Product product, JSONObject productJson) throws JSONException {
+    private void putImagesOnJSONObject(Product product, JSONObject productJson) throws JSONException {
         List<Long> imagesId = new ArrayList<Long>();
         final List<Image> images = product.getImages();
         if (images != null) {
@@ -194,7 +211,7 @@ public class ProductResource {
         try {
             JPAUtil.shutdown();
         } catch (IOException e) {
-            final String erroMessage = "An error occurred while trying to create ProductResource. " + e;
+            final String erroMessage = "An error occurred while trying to shutdown database. " + e;
             logger.log (Level.SEVERE, erroMessage);
             messageReturn.put("messageReturn", erroMessage);
             throw new InternalServerErrorException(messageReturn);
