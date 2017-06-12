@@ -16,24 +16,6 @@ public class ImageRepository {
         this.em = em;
     }
 
-    public Product get(long id) {
-        return em.find(Product.class,id);
-    }
-
-    /*public List<Product> get() {
-        CriteriaQuery<Product> criteria = em.getCriteriaBuilder().createQuery(Product.class);
-        Root<Product> root = criteria.from(Product.class);
-        criteria.select(root);
-        return em.createQuery(criteria).getResultList();
-    }*/
-
-    /*public void update(Product product) {
-        verifyFieldsNotNull(product);
-        em.getTransaction().begin();
-        em.merge(product);
-        em.getTransaction().commit();
-    }*/
-
     public void create(Image image) {
         verifyFieldsNotNull(image);
         em.getTransaction().begin();
