@@ -6,9 +6,7 @@ import br.com.productrestfulapi.utils.DataBaseUtils;
 import io.restassured.response.Response;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.EntityManager;
@@ -41,7 +39,7 @@ public class ProductResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        url = "http://localhost:8080/productAPI/product";
+        url = URLApi.product();
     }
 
     @Test
@@ -126,9 +124,9 @@ public class ProductResourceTest {
 
     @Test
     public void should_update_product() throws Exception {
-        DataBaseUtils.deleteProducts();
+        DataBaseUtils.deleteEntities();
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
-        final long id = DataBaseUtils.persistProductsAndGetId(productOne);
+        final long id = DataBaseUtils.deleteEntitiesAndPersistProductAndGetId(productOne);
         JPAUtil.shutdown();
         url = url + "/" + id;
         logger.log(Level.INFO, url);
@@ -142,7 +140,7 @@ public class ProductResourceTest {
 
     @Test
     public void should_create_product() throws Exception {
-        DataBaseUtils.deleteProducts();
+        DataBaseUtils.deleteEntities();
         JPAUtil.shutdown();
         logger.log(Level.INFO, url);
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
@@ -151,13 +149,13 @@ public class ProductResourceTest {
         Response response = given().contentType("application/json").and().body(productToCreate.toString()).post(url);
         assertEquals(200,response.getStatusCode());
         assertEquals("Product "+productName+" was Created",response.jsonPath().get("messageReturn"));
-        DataBaseUtils.assertProductWasCreated(productOne);
+        DataBaseUtils.assertWasCreated(productOne);
     }
 
     @Test
     public void should_delete_product() throws Exception {
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
-        DataBaseUtils.persistProducts(productOne);
+        DataBaseUtils.persist(productOne);
         JPAUtil.shutdown();
         final long productId = productOne.getId();
         String urlDelete = url + "/" + productId;

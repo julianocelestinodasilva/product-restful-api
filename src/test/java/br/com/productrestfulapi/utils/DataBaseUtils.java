@@ -47,7 +47,7 @@ public class DataBaseUtils {
         assertEquals(newName,productDataBase.getName());
     }
 
-    public static  void assertProductWasCreated(Product product) throws IOException {
+    public static  void assertWasCreated(Product product) throws IOException {
         List<Product> results = getProducts();
         assertNotNull(results);
         assertEquals(1,results.size());
@@ -60,7 +60,15 @@ public class DataBaseUtils {
         }
     }
 
-    public static void persistProducts(Product product) throws IOException {
+    public static  void assertWasCreated(Image image) throws IOException {
+        List<Image> results = getImages();
+        assertNotNull(results);
+        assertEquals(1,results.size());
+        Image imageDataBase = results.get(0);
+        assertEquals(image.getProduct().getId(),imageDataBase.getProduct().getId());
+    }
+
+    public static void persist(Product product) throws IOException {
         EntityManager em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
@@ -70,7 +78,21 @@ public class DataBaseUtils {
         em.getTransaction().commit();
     }
 
-    public static void deleteProducts() throws IOException {
+    public static Image persistImageAndProduct(Product product) throws IOException {
+        EntityManager em = JPAUtil.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("DELETE FROM Image").executeUpdate();
+        em.createNativeQuery("DELETE FROM Product").executeUpdate();
+        final long id = persistProductAndGetId(product,em);
+        product.setId(id);
+        final Image image = new Image(product);
+        em.persist(image);
+        em.flush();
+        em.getTransaction().commit();
+        return image;
+    }
+
+    public static void deleteEntities() throws IOException {
         EntityManager em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
@@ -79,7 +101,7 @@ public class DataBaseUtils {
         em.getTransaction().commit();
     }
 
-    public static long persistProductsAndGetId(Product product) throws IOException {
+    public static long deleteEntitiesAndPersistProductAndGetId(Product product) throws IOException {
         EntityManager em = JPAUtil.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM Image").executeUpdate();
@@ -91,9 +113,27 @@ public class DataBaseUtils {
         return results.get(0).getId();
     }
 
+    private static long persistProductAndGetId(Product product,EntityManager em) throws IOException {
+        em.persist(product);
+        em.flush();
+        List<Product> results = getProducts(em);
+        return results.get(0).getId();
+    }
+
     private static List<Product> getProducts() throws IOException {
         EntityManager em = JPAUtil.createEntityManager();
         Query query = em.createQuery("SELECT c FROM Product c");
         return (List<Product>) query.getResultList();
+    }
+
+    private static List<Product> getProducts(EntityManager em) throws IOException {
+        Query query = em.createQuery("SELECT c FROM Product c");
+        return (List<Product>) query.getResultList();
+    }
+
+    private static List<Image> getImages() throws IOException {
+        EntityManager em = JPAUtil.createEntityManager();
+        Query query = em.createQuery("SELECT c FROM Image c");
+        return (List<Image>) query.getResultList();
     }
 }

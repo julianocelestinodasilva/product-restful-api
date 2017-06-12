@@ -39,10 +39,25 @@ public class ImageResourceTest {
     }
 
     @Test
+    public void should_delete_image() throws Exception {
+        product = new Product("Primeiro Produto", "Primeiro Produto");
+        image = DataBaseUtils.persistImageAndProduct(product);
+        JPAUtil.shutdown();
+        final long imageId = image.getId();
+        String urlDelete = url + "/" + imageId;
+        logger.log(Level.INFO, urlDelete);
+        Response response = given().contentType("application/json").and().delete(urlDelete);
+        assertEquals(200,response.getStatusCode());
+        assertEquals("Image "+imageId+" was Deleted",response.jsonPath().get("messageReturn"));
+        em = JPAUtil.createEntityManager();
+        assertNull(em.find(Image.class, imageId));
+    }
+
+    @Test
     public void should_create_image() throws Exception {
         DataBaseUtils.deleteEntities();
         final Product product = new Product("Primeiro Produto", "Primeiro Produto");
-        final long id = DataBaseUtils.persistProductsAndGetId(product);
+        final long id = DataBaseUtils.deleteEntitiesAndPersistProductAndGetId(product);
         product.setId(id);
         JPAUtil.shutdown();
         image = new Image(product);
@@ -105,7 +120,7 @@ public class ImageResourceTest {
     public void should_update_product() throws Exception {
         DataBaseUtils.deleteEntities();
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
-        final long id = DataBaseUtils.persistProductsAndGetId(productOne);
+        final long id = DataBaseUtils.deleteEntitiesAndPersistProductAndGetId(productOne);
         JPAUtil.shutdown();
         url = url + "/" + id;
         logger.log(Level.INFO, url);
@@ -134,7 +149,7 @@ public class ImageResourceTest {
     @Test
     public void should_delete_product() throws Exception {
         productOne = new Product("Primeiro Produto", "Primeiro Produto");
-        DataBaseUtils.persistProducts(productOne);
+        DataBaseUtils.persistImageAndProduct(productOne);
         JPAUtil.shutdown();
         final long productId = productOne.getId();
         String urlDelete = url + "/" + productId;

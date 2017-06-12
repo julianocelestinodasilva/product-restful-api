@@ -41,16 +41,16 @@ public class ImageRepository {
         em.getTransaction().commit();
     }
 
-    /*public boolean delete(long id) {
-        Product product = em.find(Product.class, id);
-        if (product == null) {
+    public boolean delete(long id) {
+        Image image = em.find(Image.class, id);
+        if (image == null) {
             return false;
         }
         em.getTransaction().begin();
-        em.remove(product);
+        em.remove(image);
         em.getTransaction().commit();
         return true;
-    }*/
+    }
 
     private void verifyFieldsNotNull(Image image) {
         if (image == null) {

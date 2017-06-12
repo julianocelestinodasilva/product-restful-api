@@ -47,6 +47,24 @@ public class ImageResource {
         }
     }
 
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Path("/{id}")
+    public JSONObject delete(@PathParam("id") long id) throws JSONException {
+        try {
+            boolean wasDeleted = repository.delete(id);
+            if (!wasDeleted) {
+                messageReturn.put("messageReturn", "Image "+id+" not Found");
+                throw new NotFoundException(messageReturn);
+            }
+            messageReturn.put("messageReturn","Image "+id+" was Deleted");
+            return messageReturn;
+        } finally {
+            em.close();
+            shutdown();
+        }
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=UTF-8")

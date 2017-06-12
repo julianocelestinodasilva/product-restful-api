@@ -49,9 +49,9 @@ public class ProductRepositoryTest {
 
     @Test
     public void should_update_product() throws Exception {
-        DataBaseUtils.deleteProducts();
+        DataBaseUtils.deleteEntities();
         product = new Product("Primeiro Produto", "Primeiro Produto");
-        final long id = DataBaseUtils.persistProductsAndGetId(product);
+        final long id = DataBaseUtils.deleteEntitiesAndPersistProductAndGetId(product);
         final String productName = "Namde Update";
         product.setName(productName);
         product.setId(id);
@@ -61,16 +61,16 @@ public class ProductRepositoryTest {
 
     @Test
     public void should_create_product() throws Exception {
-        DataBaseUtils.deleteProducts();
+        DataBaseUtils.deleteEntities();
         product = new Product("Primeiro Produto", "Primeiro Produto");
         repository.create(product);
-        DataBaseUtils.assertProductWasCreated(product);
+        DataBaseUtils.assertWasCreated(product);
     }
 
     @Test
     public void should_delete_product() throws Exception {
         product = new Product("Primeiro Produto", "Primeiro Produto");
-        DataBaseUtils.persistProducts(product);
+        DataBaseUtils.persist(product);
         final long productId = product.getId();
         repository.delete(productId);
         em = JPAUtil.createEntityManager();
